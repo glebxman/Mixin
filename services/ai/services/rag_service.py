@@ -30,9 +30,9 @@ COLLECTION_NAME = os.getenv("QDRANT_COLLECTION", "textbooks")
 EMBEDDING_MODEL_LOCAL = os.getenv(
     "EMBEDDING_MODEL_LOCAL", "intfloat/multilingual-e5-base"
 )
-RAG_TOP_K = int(os.getenv("RAG_TOP_K", "5"))
-RAG_MIN_SCORE = float(os.getenv("RAG_MIN_SCORE", "0.45"))
-RAG_MAX_CHARS_PER_HIT = int(os.getenv("RAG_MAX_CHARS_PER_HIT", "900"))
+RAG_TOP_K = int(os.getenv("RAG_TOP_K", "3"))
+RAG_MIN_SCORE = float(os.getenv("RAG_MIN_SCORE", "0.5"))
+RAG_MAX_CHARS_PER_HIT = int(os.getenv("RAG_MAX_CHARS_PER_HIT", "500"))
 
 
 @dataclass
@@ -189,22 +189,22 @@ def retrieve_context(
 
 
 def format_context_block(hits: List[RetrievedHit]) -> str:
-    """Готовит компактный блок текста для system prompt."""
+    """Compact context block to be appended to the system prompt."""
     if not hits:
         return ""
-    lines = ["═══ КОНТЕКСТ ИЗ УЧЕБНИКОВ ═══"]
+    lines = ["═══ TEXTBOOK CONTEXT ═══"]
     lines.append(
-        "Ниже фрагменты из школьных учебников, релевантные вопросу. "
-        "Используй их как опору при объяснении и ссылайся на них при необходимости. "
-        "Если фрагменты не отвечают на вопрос — отвечай как обычно, "
-        "не выдумывай ссылки на учебник."
+        "Below are excerpts from school textbooks relevant to the student's question. "
+        "Use them as a grounding for your explanation and reference them when useful. "
+        "If the excerpts don't actually answer the question, just answer normally — "
+        "do NOT invent textbook references."
     )
     for i, hit in enumerate(hits, start=1):
         meta = []
         if hit.subject and hit.subject != "unknown":
             meta.append(hit.subject)
         if hit.grade:
-            meta.append(f"{hit.grade} класс")
+            meta.append(f"grade {hit.grade}")
         if hit.language:
             meta.append(hit.language)
         meta.append(f"score={hit.score:.2f}")

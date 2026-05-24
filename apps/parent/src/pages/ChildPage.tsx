@@ -13,6 +13,7 @@ import {
   ClockIcon,
   FireIcon,
   LightBulbIcon,
+  SparklesIcon,
   TrophyIcon,
 } from "@heroicons/react/24/outline";
 
@@ -148,6 +149,10 @@ export function ChildPage() {
             tone="orange"
           />
         </div>
+
+        {analytics.aiAnalysisParent && (
+          <ParentAiAnalysisCard feedback={analytics.aiAnalysisParent} />
+        )}
 
         <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
           <SubjectPanel subjects={analytics.subjectScores.slice(0, 6)} />
@@ -327,6 +332,31 @@ function ListCard({
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function ParentAiAnalysisCard({ feedback }: { feedback: string }) {
+  const paragraphs = feedback.split("\n").filter((p) => p.trim().length > 0);
+
+  return (
+    <div className="mb-6 rounded-[28px] border border-[#d9d9d1] bg-gradient-to-br from-[#f8f8f2] via-white to-[#ecece2] p-6 shadow-[0_18px_35px_rgba(37,38,34,0.05)]">
+      <div className="flex items-center gap-2.5 mb-3">
+        <span className="grid size-9 place-items-center rounded-full bg-[#f2ff19] text-[#2e3129] shadow-[0_0_15px_rgba(242,255,25,0.5)]">
+          <SparklesIcon className="size-5 animate-pulse" />
+        </span>
+        <div>
+          <h2 className="text-xl font-bold text-[#151614]">Анализ ИИ-тьютора для родителя</h2>
+          <p className="text-xs text-[#77786f]">Индивидуальный разбор успеваемости и рекомендации по поддержке вашего ребенка</p>
+        </div>
+      </div>
+      <div className="space-y-3 mt-4 border-t border-[#e2e2da] pt-4">
+        {paragraphs.map((para, index) => (
+          <p key={index} className="text-sm leading-relaxed text-[#42433f]">
+            {para}
+          </p>
+        ))}
+      </div>
     </div>
   );
 }

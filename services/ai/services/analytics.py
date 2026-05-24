@@ -1,26 +1,11 @@
 """
 Сервис аналитики для учеников.
-Анализирует прогресс, активность и генерирует рекомендации.
-Использует OpenRouter (OpenAI-совместимый API) вместо Google Gemini.
+Анализирует прогресс, активность и генерирует рекомендации без вызовов LLM.
+Если в будущем понадобится LLM — используйте `services.llm_service.chat`.
 """
 
-import os
-import json
+import json  # noqa: F401  # сохранён на случай будущего сериализационного кода
 from typing import List, Dict
-import httpx
-
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-MODEL = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
-
-
-def _headers() -> dict:
-    return {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://mixin.uz",
-        "X-Title": "Mixin EdTech UZ",
-    }
 
 
 class AnalyticsService:

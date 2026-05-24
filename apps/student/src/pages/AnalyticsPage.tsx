@@ -95,6 +95,12 @@ export function AnalyticsPage() {
         />
       </div>
 
+      {analytics.aiAnalysisStudent && (
+        <div className="my-4">
+          <AiAnalysisCard feedback={analytics.aiAnalysisStudent} />
+        </div>
+      )}
+
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.95fr)]">
         <div className="min-w-0 space-y-4">
           <SubjectScores items={analytics.subjectScores} />
@@ -363,4 +369,34 @@ function statusLabel(status: "connected" | "planned" | "needs_setup", t: any) {
   if (status === "connected") return t("analytics.statusConnected");
   if (status === "needs_setup") return t("analytics.statusNeedsSetup");
   return t("analytics.statusPlanned");
+}
+
+function AiAnalysisCard({ feedback }: { feedback: string }) {
+  const { t } = useI18n();
+  const paragraphs = feedback.split("\n").filter((p) => p.trim().length > 0);
+
+  return (
+    <Card className="relative overflow-hidden border-violet-150 dark:border-violet-900 bg-gradient-to-br from-violet-50/50 via-white to-indigo-50/30 dark:from-violet-950/40 dark:via-neutral-900 dark:to-indigo-950/30 shadow-sm">
+      <div className="absolute right-0 top-0 -mr-6 -mt-6 size-24 rounded-full bg-violet-200/30 dark:bg-violet-850/10 blur-2xl" />
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-xl font-bold text-neutral-950 dark:text-neutral-50">
+          <SparklesIcon className="size-6 text-violet-600 dark:text-violet-400 animate-pulse" />
+          {t("analytics.aiAnalysisTitle")}
+        </CardTitle>
+        <p className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+          {t("analytics.aiAnalysisDescription")}
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {paragraphs.map((para, index) => (
+          <p
+            key={index}
+            className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 font-normal"
+          >
+            {para}
+          </p>
+        ))}
+      </CardContent>
+    </Card>
+  );
 }

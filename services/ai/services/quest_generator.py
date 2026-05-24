@@ -180,16 +180,9 @@ class QuestGeneratorService:
 Верни только JSON, без дополнительного текста."""
         
     def _parse_quest_response(self, response_text: str) -> Dict:
-        """Парсит ответ AI и извлекает JSON"""
-        try:
-            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
-            if json_match:
-                return json.loads(json_match.group())
-            
-            return {}
-        except Exception as e:
-            print(f"Ошибка парсинга ответа: {e}")
-            return {}
+        """Извлекает JSON из ответа AI с помощью общего экстрактора."""
+        from utils.json_extract import extract_json_object  # local import to keep top tidy
+        return extract_json_object(response_text)
     
     def _get_fallback_quest(
         self,

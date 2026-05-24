@@ -9,9 +9,13 @@ python-dotenv>=1.0.0
 PyPDF2>=3.0.0
 python-docx>=1.1.0
 
-# ─── RAG ingestion (process_textbooks.py) ─────────────────────
-# Used by scripts/process_textbooks.py to build the Qdrant index
-# from the textbooks corpus. Optional at runtime; only required
-# when running the indexing CLI.
+# ─── RAG ingestion + retrieval ────────────────────────────────
+# Used by:
+#   • scripts/process_textbooks.py — to build the Qdrant index
+#   • services/rag_service.py     — to query it from the chat router
+# torch is pinned to CPU-only wheels via --extra-index-url (~250 MB)
+# instead of the default GPU build (>2 GB with CUDA).
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.2.0,<3.0.0
 tqdm>=4.66.0
 sentence-transformers>=3.0.0

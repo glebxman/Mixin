@@ -1,6 +1,6 @@
 """
-Vision-call для chat-роутера. Принимает фото + текст и возвращает текстовый
-ответ модели. Раньше это было inline в routers/chat.py.
+Vision-call for the chat router. Takes a photo + text and returns a textual
+answer from the model. Was inlined in routers/chat.py before extraction.
 """
 
 import os
@@ -8,8 +8,12 @@ from typing import Optional, Dict
 
 import httpx
 
-_OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-_OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+from .openrouter import (
+    CHAT_COMPLETIONS_URL,
+    headers as openrouter_headers,
+    is_configured as openrouter_is_configured,
+)
+
 _VISION_MODEL = os.getenv(
     "OPENROUTER_VISION_MODEL",
     os.getenv("OPENROUTER_MODEL", "openrouter/free"),
@@ -26,15 +30,6 @@ _SUPPORTED_IMAGE_MIME_TYPES = {
 _HTTP_TIMEOUT = 90.0
 
 
-def _headers() -> dict[str, str]:
-    return {
-        "Authorization": f"Bearer {_OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://mixin.uz",
-        "X-Title": "Mixin EdTech UZ",
-    }
-
-
 async def process_image_with_text(
     prompt: str,
     data_url: str,
@@ -42,31 +37,32 @@ async def process_image_with_text(
     student_context: Optional[Dict] = None,
 ) -> str:
     """
-    Принимает фото в виде data: URL и текстовый prompt; возвращает текстовый
-    ответ модели на языке пользователя.
+    Accepts a photo as a data: URL plus a text prompt; returns a text answer
+    in the student's language.
 
-    student_context зарезервирован для будущих параметров (возраст и т.п.).
+    student_context is reserved for future parameters (age, etc.).
     """
     del student_context  # accepted for signature parity
 
-    if not _OPENROUTER_API_KEY:
-        return "AI-сервис для анализа фото пока не настроен. Добавьте OPENROUTER_API_KEY в .env."
+    if not openrouter_is_configured():
+        return "AI photo analysis is not configured. Add OPENROUTER_API_KEY to .env."
 
     if (
         not data_url.startswith("data:image/")
         or mime_type.lower() not in _SUPPORTED_IMAGE_MIME_TYPES
     ):
-        return "Не получилось прочитать фото. Поддерживаются JPG, PNG, WEBP, GIF, HEIC и HEIF."
+        return "Could not read the photo. Supported formats: JPG, PNG, WEBP, GIF, HEIC, HEIF."
 
-    text_prompt = prompt.strip() or "Проанализируй фото и помоги ученику с заданием."
+    text_prompt = prompt.strip() or "Analyze the photo and help the student with the task."
     messages = [
         {
             "role": "system",
             "content": (
-                "Ты Mixin Nano, AI-наставник для школьников Узбекистана. "
-                "Проанализируй изображение: если это задача, реши пошагово; "
-                "если это текст, объясни содержание; если это схема, разберись в ней. "
-                "Отвечай на языке пользователя, понятно и без упоминания названия внешней модели."
+                "You are Mixin Nano, an AI tutor for school students in Uzbekistan. "
+                "Analyze the image: if it's a problem, solve it step by step; "
+                "if it's a text, explain its content; if it's a diagram, work through it. "
+                "Always reply in the same language the student writes in. "
+                "Do not mention any external model name."
             ),
         },
         {
@@ -81,8 +77,8 @@ async def process_image_with_text(
     try:
         async with httpx.AsyncClient(timeout=_HTTP_TIMEOUT) as client:
             response = await client.post(
-                f"{_OPENROUTER_BASE_URL}/chat/completions",
-                headers=_headers(),
+                CHAT_COMPLETIONS_URL,
+                headers=openrouter_headers(),
                 json={
                     "model": _VISION_MODEL,
                     "messages": messages,
@@ -93,9 +89,9 @@ async def process_image_with_text(
             response.raise_for_status()
             data = response.json()
             reply = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-            return str(reply).strip() or "Не получилось получить ответ по фото."
+            return str(reply).strip() or "Could not get an answer from the photo."
     except Exception as exc:
         return (
-            "Я получил фото, но vision-модель сейчас не ответила. "
-            f"Попробуй отправить фото ещё раз или опиши задание текстом. Ошибка: {exc}"
+            "I received the photo, but the vision model didn't respond. "
+            f"Please send the photo again or describe the task in text. Error: {exc}"
         )

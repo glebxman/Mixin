@@ -188,7 +188,9 @@
     "recommendationsTitle": "Tavsiyalar",
     "recommendationsEmpty": "Hozircha maslahatlar yoʻq",
     "levelCardTitle": "Daraja {level}",
-    "levelCardNext": "keyingi darajagacha {xp} XP"
+    "levelCardNext": "keyingi darajagacha {xp} XP",
+    "aiAnalysisTitle": "Shaxsiy AI-tahlil",
+    "aiAnalysisDescription": "Sizning AI-murabbiyingizdan oʻzlashtirish, karyera istiqbollari va shaxsiy tavsiyalarning batafsil tahlili."
   },
   "quests": {
     "title": "Kvestlar",
@@ -268,7 +270,47 @@
   "admin": {
     "dashboard": "Administrator paneli",
     "users": "Foydalanuvchilar",
-    "stats": "Statistika"
+    "stats": "Statistika",
+    "usersPage": {
+      "eyebrow": "Boshqaruv",
+      "title": "Foydalanuvchilar",
+      "description": "Foydalanuvchilarni koʻrish, tarifni almashtirish va bloklash",
+      "searchPlaceholder": "Ism yoki email boʻyicha qidiruv...",
+      "filterAllRoles": "Barcha rollar",
+      "filterAllPlans": "Barcha tariflar",
+      "filterAllStatus": "Har qanday holat",
+      "statusActive": "Faol",
+      "statusBlocked": "Bloklangan",
+      "thName": "Ism",
+      "thEmail": "Email",
+      "thRole": "Rol",
+      "thPlan": "Tarif",
+      "thStatus": "Holat",
+      "thCreated": "Yaratilgan",
+      "thActions": "Amallar",
+      "block": "Bloklash",
+      "unblock": "Blokdan chiqarish",
+      "changePlan": "Tarifni almashtirish",
+      "noResults": "Filtrlarga mos foydalanuvchilar topilmadi",
+      "noResultsDesc": "Qidiruv yoki filtrlarni oʻzgartirib koʻring.",
+      "rowsPerPage": "Sahifada",
+      "showingOf": "{from}-{to} / {total}",
+      "prev": "Orqaga",
+      "next": "Keyingi",
+      "page": "Sahifa {page} / {totalPages}",
+      "planDialog": {
+        "title": "Tarifni almashtirish",
+        "user": "Foydalanuvchi",
+        "currentPlan": "Joriy tarif",
+        "newPlan": "Yangi tarif",
+        "reason": "Sabab (ixtiyoriy)",
+        "reasonPlaceholder": "masalan: aksiya, qoʻllab-quvvatlash kompensatsiyasi",
+        "submit": "Qoʻllash",
+        "cancel": "Bekor",
+        "errorSamePlan": "Tanlangan tarif joriy bilan bir xil",
+        "successToast": "Tarif yangilandi"
+      }
+    }
   },
   "settings": {
     "title": "Sozlamalar",
@@ -325,7 +367,12 @@
       "generationCost": "Yaratish narxi",
       "generationCostDesc": "Chat: 1000 token = 50 kredit. Rasm 50 kredit, video 300 kredit",
       "freePlanScope": "Free: testlar",
-      "personalScope": "Shaxsiy"
+      "personalScope": "Shaxsiy",
+      "parentCodeTitle": "Ota-ona uchun kod",
+      "parentCodeDesc": "Ushbu kodni ota-onangizga bering. Ular buni ota-onalar paneliga kiritib, sizning progresslaringizni kuzatib boradilar.",
+      "generatingCode": "Kod yaratilmoqda...",
+      "codeUnavailable": "Kod mavjud emas",
+      "expiresAt": "{date} gacha amal qiladi"
     },
     "data": {
       "title": "Maʼlumotlarni boshqarish",

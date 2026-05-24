@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { findStudentByUserId } from "../students/students.service.js";
+import { requireStudent } from "../students/students.service.js";
 
 const subjectIdParamSchema = z.object({ subjectId: z.string().uuid() });
 
@@ -9,10 +9,9 @@ export async function progressRoutes(app: FastifyInstance) {
     "/",
     { preHandler: [app.authenticate, app.requireRole("STUDENT")] },
     async (request, reply) => {
-      const student = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!student) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
+
       const list = await app.prisma.subjectProgress.findMany({
         where: { studentId: student.id },
         include: { subject: true },
@@ -39,10 +38,9 @@ export async function progressRoutes(app: FastifyInstance) {
         return reply.status(400).send({ success: false, error: "Invalid subjectId" });
       }
 
-      const student = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!student) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
+
       const progress = await app.prisma.subjectProgress.findUnique({
         where: {
           studentId_subjectId: {

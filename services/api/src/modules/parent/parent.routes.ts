@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { buildStudentAnalytics } from "../../utils/analytics.js";
+import { buildStudentAnalytics, generateAiFeedback } from "../../utils/analytics.js";
 import { verifyParentLinkCode } from "../../utils/parent-link-code.js";
 
 const idParamSchema = z.object({ id: z.string().uuid() });
@@ -182,6 +182,29 @@ export async function parentRoutes(app: FastifyInstance) {
         totalQuests,
       });
 
+      const cacheKey = `student:analytics:ai-feedback:${child.id}`;
+      let aiFeedbackRaw = await app.redis.get(cacheKey);
+      let aiFeedback;
+
+      if (aiFeedbackRaw) {
+        try {
+          aiFeedback = JSON.parse(aiFeedbackRaw);
+        } catch {
+          aiFeedback = null;
+        }
+      }
+
+      if (!aiFeedback) {
+        aiFeedback = await generateAiFeedback(analytics);
+        await app.redis.set(cacheKey, JSON.stringify(aiFeedback), "EX", 7200);
+      }
+
+      const responseData = {
+        ...analytics,
+        aiAnalysisStudent: aiFeedback.aiAnalysisStudent,
+        aiAnalysisParent: aiFeedback.aiAnalysisParent,
+      };
+
       return {
         success: true,
         data: {
@@ -196,7 +219,7 @@ export async function parentRoutes(app: FastifyInstance) {
             level: child.level,
             streakDays: child.streakDays,
           },
-          analytics,
+          analytics: responseData,
         },
       };
     },

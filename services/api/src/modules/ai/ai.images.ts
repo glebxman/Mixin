@@ -3,6 +3,7 @@ import { z } from "zod";
 import { findStudentByUserId } from "../students/students.service.js";
 import { CREDIT_COSTS, SUBSCRIPTION_LIMITS } from "@edtech/config";
 import { consumeDailyCredits } from "../../utils/credits.js";
+import { incrementDailyCounter } from "../../utils/redis-rate-limit.js";
 
 const generateImageSchema = z.object({
   prompt: z.string().min(1).max(500),
@@ -36,39 +37,11 @@ async function checkAndIncrementImageLimit(
   userId: string,
   limit: number,
 ): Promise<{ allowed: boolean; used: number }> {
-  if (process.env.AI_RATE_LIMIT_DISABLED === "true") {
-    if (process.env.NODE_ENV === "production") {
-      app.log.warn(
-        { userId },
-        "AI image rate limit bypassed (AI_RATE_LIMIT_DISABLED=true in production)",
-      );
-    }
-    return { allowed: true, used: 0 };
-  }
-  if (limit < 0) return { allowed: true, used: 0 };
-
-  const today = new Date().toISOString().slice(0, 10);
-  const key = `${IMAGE_DAILY_LIMIT_PREFIX}${userId}:${today}`;
-
-  const lua = `
-    local current = tonumber(redis.call('get', KEYS[1]) or '0')
-    local limit = tonumber(ARGV[1])
-    local ttl = tonumber(ARGV[2])
-    if current >= limit then return { 0, current } end
-    local next = redis.call('incr', KEYS[1])
-    if next == 1 then redis.call('expire', KEYS[1], ttl) end
-    return { 1, next }
-  `;
-
-  const result = (await app.redis.eval(
-    lua,
-    1,
-    key,
-    String(limit),
-    String(60 * 60 * 26),
-  )) as [number, number];
-
-  return { allowed: result[0] === 1, used: result[1] };
+  return incrementDailyCounter(app, {
+    keyPrefix: IMAGE_DAILY_LIMIT_PREFIX,
+    userId,
+    limit,
+  });
 }
 
 // consumeDailyCredits imported from ../../utils/credits.ts

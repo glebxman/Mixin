@@ -10,6 +10,7 @@ import { z } from "zod";
 import { CREDIT_COSTS, SUBSCRIPTION_LIMITS } from "@edtech/config";
 import { findStudentByUserId } from "../students/students.service.js";
 import { consumeDailyCredits } from "../../utils/credits.js";
+import { incrementDailyCounter } from "../../utils/redis-rate-limit.js";
 
 export const sessionIdParamSchema = z.object({
   sessionId: z.string().uuid(),
@@ -55,44 +56,16 @@ export type StoredMessage = { role: "user" | "assistant" | "system"; content: st
 const AI_DAILY_LIMIT_PREFIX = "ai:daily:";
 export const AI_HISTORY_LIMIT = 24;
 
-const RATELIMIT_LUA = `
-  local current = tonumber(redis.call('get', KEYS[1]) or '0')
-  local limit = tonumber(ARGV[1])
-  local ttl = tonumber(ARGV[2])
-  if current >= limit then return { 0, current } end
-  local next = redis.call('incr', KEYS[1])
-  if next == 1 then redis.call('expire', KEYS[1], ttl) end
-  return { 1, next }
-`;
-
 export async function checkAndIncrementDailyLimit(
   app: FastifyInstance,
   userId: string,
   limit: number,
 ): Promise<{ allowed: boolean; used: number }> {
-  if (process.env.AI_RATE_LIMIT_DISABLED === "true") {
-    if (process.env.NODE_ENV === "production") {
-      app.log.warn(
-        { userId },
-        "AI rate limit bypassed (AI_RATE_LIMIT_DISABLED=true in production)",
-      );
-    }
-    return { allowed: true, used: 0 };
-  }
-  if (limit < 0) return { allowed: true, used: 0 };
-
-  const today = new Date().toISOString().slice(0, 10);
-  const key = `${AI_DAILY_LIMIT_PREFIX}${userId}:${today}`;
-
-  const result = (await app.redis.eval(
-    RATELIMIT_LUA,
-    1,
-    key,
-    String(limit),
-    String(60 * 60 * 26),
-  )) as [number, number];
-
-  return { allowed: result[0] === 1, used: result[1] };
+  return incrementDailyCounter(app, {
+    keyPrefix: AI_DAILY_LIMIT_PREFIX,
+    userId,
+    limit,
+  });
 }
 
 /**

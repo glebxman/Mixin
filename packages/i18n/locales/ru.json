@@ -188,7 +188,9 @@
     "recommendationsTitle": "Рекомендации",
     "recommendationsEmpty": "Пока нет советов",
     "levelCardTitle": "Уровень {level}",
-    "levelCardNext": "до следующего уровня {xp} XP"
+    "levelCardNext": "до следующего уровня {xp} XP",
+    "aiAnalysisTitle": "Индивидуальный ИИ-анализ",
+    "aiAnalysisDescription": "Детальный разбор успеваемости, карьерных перспектив и персональных рекомендаций от вашего ИИ-наставника."
   },
   "quests": {
     "title": "Квесты",
@@ -268,7 +270,47 @@
   "admin": {
     "dashboard": "Панель администратора",
     "users": "Пользователи",
-    "stats": "Статистика"
+    "stats": "Статистика",
+    "usersPage": {
+      "eyebrow": "Управление",
+      "title": "Пользователи",
+      "description": "Просмотр пользователей, смена тарифа и блокировка аккаунтов",
+      "searchPlaceholder": "Поиск по имени или email...",
+      "filterAllRoles": "Все роли",
+      "filterAllPlans": "Все тарифы",
+      "filterAllStatus": "Любой статус",
+      "statusActive": "Активен",
+      "statusBlocked": "Заблокирован",
+      "thName": "Имя",
+      "thEmail": "Email",
+      "thRole": "Роль",
+      "thPlan": "Тариф",
+      "thStatus": "Статус",
+      "thCreated": "Создан",
+      "thActions": "Действия",
+      "block": "Заблокировать",
+      "unblock": "Разблокировать",
+      "changePlan": "Сменить тариф",
+      "noResults": "Нет пользователей по фильтрам",
+      "noResultsDesc": "Поменяйте поиск или фильтры.",
+      "rowsPerPage": "На странице",
+      "showingOf": "Показаны {from}-{to} из {total}",
+      "prev": "Назад",
+      "next": "Вперёд",
+      "page": "Страница {page} из {totalPages}",
+      "planDialog": {
+        "title": "Сменить тариф",
+        "user": "Пользователь",
+        "currentPlan": "Текущий тариф",
+        "newPlan": "Новый тариф",
+        "reason": "Причина (необязательно)",
+        "reasonPlaceholder": "например: промо, компенсация поддержки",
+        "submit": "Применить",
+        "cancel": "Отмена",
+        "errorSamePlan": "Выбранный тариф совпадает с текущим",
+        "successToast": "Тариф обновлён"
+      }
+    }
   },
   "settings": {
     "title": "Настройки",
@@ -325,7 +367,12 @@
       "generationCost": "Стоимость генерации",
       "generationCostDesc": "Чат: 1000 токенов = 50 кредитов. Картинка 50 кредитов, видео 300 кредитов",
       "freePlanScope": "Free: тесты",
-      "personalScope": "Личный"
+      "personalScope": "Личный",
+      "parentCodeTitle": "Код для родителя",
+      "parentCodeDesc": "Передайте этот код родителю. Он введёт его в родительской панели и увидит ваш прогресс.",
+      "generatingCode": "Генерируем код...",
+      "codeUnavailable": "Код недоступен",
+      "expiresAt": "Действует до {date}"
     },
     "data": {
       "title": "Управление данными",

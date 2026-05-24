@@ -1,19 +1,17 @@
 import type { FastifyInstance } from "fastify";
 import { onboardingSchema } from "@edtech/types";
 import { ZodError } from "zod";
-import { buildStudentAnalytics } from "../../utils/analytics.js";
+import { buildStudentAnalytics, generateAiFeedback } from "../../utils/analytics.js";
 import { createParentLinkCode } from "../../utils/parent-link-code.js";
-import { findStudentByUserId, getOrCreateStudentProfile } from "./students.service.js";
+import { getOrCreateStudentProfile, requireStudent } from "./students.service.js";
 
 export async function studentsRoutes(app: FastifyInstance) {
   app.get(
     "/me",
     { preHandler: [app.authenticate, app.requireRole("STUDENT")] },
     async (request, reply) => {
-      const profile = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!profile) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const profile = await requireStudent(app, request, reply);
+      if (!profile) return;
       return { success: true, data: profile };
     },
   );
@@ -55,10 +53,8 @@ export async function studentsRoutes(app: FastifyInstance) {
     "/me/analytics",
     { preHandler: [app.authenticate, app.requireRole("STUDENT")] },
     async (request, reply) => {
-      const profile = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!profile) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const profile = await requireStudent(app, request, reply);
+      if (!profile) return;
 
       const [subjectProgress, aiSessions, questProgress, totalQuests] = await Promise.all([
         app.prisma.subjectProgress.findMany({
@@ -107,7 +103,30 @@ export async function studentsRoutes(app: FastifyInstance) {
         totalQuests,
       });
 
-      return { success: true, data: analytics };
+      const cacheKey = `student:analytics:ai-feedback:${profile.id}`;
+      let aiFeedbackRaw = await app.redis.get(cacheKey);
+      let aiFeedback;
+
+      if (aiFeedbackRaw) {
+        try {
+          aiFeedback = JSON.parse(aiFeedbackRaw);
+        } catch {
+          aiFeedback = null;
+        }
+      }
+
+      if (!aiFeedback) {
+        aiFeedback = await generateAiFeedback(analytics);
+        await app.redis.set(cacheKey, JSON.stringify(aiFeedback), "EX", 7200);
+      }
+
+      const responseData = {
+        ...analytics,
+        aiAnalysisStudent: aiFeedback.aiAnalysisStudent,
+        aiAnalysisParent: aiFeedback.aiAnalysisParent,
+      };
+
+      return { success: true, data: responseData };
     },
   );
 
@@ -115,10 +134,8 @@ export async function studentsRoutes(app: FastifyInstance) {
     "/me/parent-link-code",
     { preHandler: [app.authenticate, app.requireRole("STUDENT")] },
     async (request, reply) => {
-      const profile = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!profile) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const profile = await requireStudent(app, request, reply);
+      if (!profile) return;
 
       const data = createParentLinkCode(profile.id);
       return { success: true, data };
@@ -129,10 +146,8 @@ export async function studentsRoutes(app: FastifyInstance) {
     "/me/quests",
     { preHandler: [app.authenticate, app.requireRole("STUDENT")] },
     async (request, reply) => {
-      const profile = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!profile) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const profile = await requireStudent(app, request, reply);
+      if (!profile) return;
 
       const quests = await app.prisma.quest.findMany({
         where: { grade: profile.grade },

@@ -80,6 +80,8 @@ export type StudentAnalytics = {
   questStrategy: QuestStrategy;
   integrations: IntegrationStatus[];
   aiModules: AiModuleStatus[];
+  aiAnalysisStudent?: string | null;
+  aiAnalysisParent?: string | null;
 };
 
 const WEEKDAY_LABELS = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
@@ -494,4 +496,114 @@ function sameSubject(a: string, b: string): boolean {
   const left = a.toLowerCase();
   const right = b.toLowerCase();
   return left.includes(right) || right.includes(left);
+}
+
+export async function generateAiFeedback(analytics: any): Promise<{
+  aiAnalysisStudent: string;
+  aiAnalysisParent: string;
+}> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const baseUrl = process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1";
+  const defaultModel = process.env.OPENROUTER_MODEL || "meta-llama/llama-4-maverick";
+
+  if (!apiKey) {
+    return {
+      aiAnalysisStudent: "ИИ-анализ временно недоступен. Заполните профиль и пройдите больше квестов, чтобы получить рекомендации.",
+      aiAnalysisParent: "ИИ-анализ временно недоступен. Пожалуйста, убедитесь, что ваш ребенок активно занимается на платформе.",
+    };
+  }
+
+  const prompt = `
+Вы — опытный ИИ-тьютор и профориентатор платформы Mixin.uz.
+Вам предоставлены данные об успеваемости ученика:
+- Класс: ${analytics.profileSummary.grade}
+- Возраст: ${analytics.profileSummary.age || "не указан"}
+- Интересы: ${analytics.profileSummary.interests.join(", ") || "не указаны"}
+- Любимые предметы: ${analytics.profileSummary.favoriteSubjects.join(", ") || "не указаны"}
+- Желаемая профессия: ${analytics.profileSummary.targetProfession || "не указана"}
+- Направление карьеры: ${analytics.profileSummary.careerDirection || "не указано"}
+- Успеваемость по предметам (в %):
+${analytics.subjectScores.map((s: any) => `  * ${s.subject}: ${s.score}% (тренд: ${s.trend})`).join("\n")}
+- Сильные стороны:
+${analytics.strengths.map((s: string) => `  * ${s}`).join("\n")}
+- Слабые стороны:
+${analytics.weaknesses.map((w: string) => `  * ${w}`).join("\n")}
+- Прогресс выполнения квестов: ${analytics.completedQuests} из ${analytics.totalQuests}
+
+Сформируйте два развернутых анализа на русском языке. Ответ предоставьте строго в формате JSON:
+{
+  "aiAnalysisStudent": "Текст анализа для ученика...",
+  "aiAnalysisParent": "Текст анализа для родителя..."
+}
+
+Требования к тексту для ученика (aiAnalysisStudent):
+- Обращайтесь на "ты", дружелюбно, мотивирующе, вдохновляюще.
+- Оцените его сильные стороны и объясните, как они помогут ему в достижении его цели (${analytics.profileSummary.targetProfession || "выбранного направления"}).
+- Дайте конкретные, практичные советы (какие темы подтянуть, какие квесты пройти) без общих фраз.
+- Держите объем около 150-250 слов, отформатируйте переносами строк для красивого чтения.
+
+Требования к тексту для родителя (aiAnalysisParent):
+- Обращайтесь уважительно, на "вы".
+- Дайте объективную картину: в чем ребенок молодец, а где ему нужна поддержка и контроль.
+- Дайте конкретные рекомендации родителю, как поддержать ребенка дома (например, хвалить за успехи в математике, помочь организовать время для информатики).
+- Объясните простым языком, подходит ли выбранное ребенком карьерное направление (${analytics.profileSummary.targetProfession || "его интересам"}) текущей успеваемости.
+- Держите объем около 150-250 слов, отформатируйте переносами строк для красивого чтения.
+
+Верните ТОЛЬКО валидный JSON без какого-либо разметки markdown (без \`\`\`json).
+`;
+
+  const modelsToTry = [
+    defaultModel,
+    "minimax/minimax-m2.5:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+  ];
+
+  let lastError: any = null;
+
+  for (const currentModel of modelsToTry) {
+    try {
+      console.log(`[generateAiFeedback] Attempting generation with ${currentModel}...`);
+      const response = await fetch(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+          "HTTP-Referer": "https://mixin.uz",
+          "X-Title": "Mixin EdTech UZ",
+        },
+        body: JSON.stringify({
+          model: currentModel,
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`OpenRouter responded with ${response.status} using ${currentModel}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content?.trim() || "";
+      const jsonStr = content.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+      const parsed = JSON.parse(jsonStr);
+
+      if (parsed.aiAnalysisStudent && parsed.aiAnalysisParent) {
+        console.log(`[generateAiFeedback] Successfully generated AI feedback with ${currentModel}`);
+        return {
+          aiAnalysisStudent: parsed.aiAnalysisStudent,
+          aiAnalysisParent: parsed.aiAnalysisParent,
+        };
+      }
+      throw new Error(`Invalid JSON format returned by ${currentModel}`);
+    } catch (error) {
+      lastError = error;
+      console.warn(`[generateAiFeedback] Model ${currentModel} failed:`, error);
+    }
+  }
+
+  console.error("All models exhausted in generateAiFeedback. Last error:", lastError);
+  return {
+    aiAnalysisStudent: "Произошла ошибка при генерации анализа ИИ. Попробуйте обновить страницу.",
+    aiAnalysisParent: "Произошла ошибка при генерации анализа ИИ для родителей. Попробуйте обновить страницу.",
+  };
 }

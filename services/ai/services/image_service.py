@@ -11,19 +11,15 @@ import logging
 import httpx
 from typing import Optional
 
-from config import IMAGE_MODEL, OPENROUTER_API_KEY, OPENROUTER_BASE_URL
+from config import IMAGE_MODEL
+from .openrouter import (
+    CHAT_COMPLETIONS_URL,
+    headers as openrouter_headers,
+    is_configured as openrouter_is_configured,
+)
 
 logger = logging.getLogger("image_service")
 logging.basicConfig(level=logging.INFO)
-
-
-def _headers() -> dict[str, str]:
-    return {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://mixin.uz",
-        "X-Title": "Mixin EdTech UZ",
-    }
 
 
 class GeneratedImage:
@@ -58,7 +54,7 @@ async def generate_image(
     Генерирует изображение и возвращает data: URL (base64).
     При ошибке поднимает RuntimeError с понятным текстом для пользователя.
     """
-    if not OPENROUTER_API_KEY:
+    if not openrouter_is_configured():
         raise RuntimeError("OPENROUTER_API_KEY не настроен")
     if not prompt or not prompt.strip():
         raise ValueError("Пустой prompt")
@@ -77,9 +73,9 @@ async def generate_image(
         timeout = httpx.Timeout(75.0, connect=10.0)
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
-                f"{OPENROUTER_BASE_URL}/chat/completions",
+                CHAT_COMPLETIONS_URL,
                 json=payload,
-                headers=_headers(),
+                headers=openrouter_headers(),
             )
     except httpx.TimeoutException as exc:
         raise RuntimeError(

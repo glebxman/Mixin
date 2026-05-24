@@ -188,7 +188,9 @@
     "recommendationsTitle": "Recommendations",
     "recommendationsEmpty": "No advice yet",
     "levelCardTitle": "Level {level}",
-    "levelCardNext": "to next level {xp} XP"
+    "levelCardNext": "to next level {xp} XP",
+    "aiAnalysisTitle": "Individual AI Analysis",
+    "aiAnalysisDescription": "Detailed analysis of academic performance, career prospects, and personalized recommendations from your AI tutor."
   },
   "quests": {
     "title": "Quests",
@@ -268,7 +270,47 @@
   "admin": {
     "dashboard": "Admin dashboard",
     "users": "Users",
-    "stats": "Stats"
+    "stats": "Stats",
+    "usersPage": {
+      "eyebrow": "Management",
+      "title": "Users",
+      "description": "Browse users, change subscription plans, and block accounts",
+      "searchPlaceholder": "Search by name or email...",
+      "filterAllRoles": "All roles",
+      "filterAllPlans": "All plans",
+      "filterAllStatus": "All statuses",
+      "statusActive": "Active",
+      "statusBlocked": "Blocked",
+      "thName": "Name",
+      "thEmail": "Email",
+      "thRole": "Role",
+      "thPlan": "Plan",
+      "thStatus": "Status",
+      "thCreated": "Created",
+      "thActions": "Actions",
+      "block": "Block",
+      "unblock": "Unblock",
+      "changePlan": "Change plan",
+      "noResults": "No users match these filters",
+      "noResultsDesc": "Try adjusting search or filters.",
+      "rowsPerPage": "Rows per page",
+      "showingOf": "Showing {from}-{to} of {total}",
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page {page} of {totalPages}",
+      "planDialog": {
+        "title": "Change subscription plan",
+        "user": "User",
+        "currentPlan": "Current plan",
+        "newPlan": "New plan",
+        "reason": "Reason (optional)",
+        "reasonPlaceholder": "e.g. promo grant, support compensation",
+        "submit": "Apply",
+        "cancel": "Cancel",
+        "errorSamePlan": "Selected plan is the same as current",
+        "successToast": "Plan updated"
+      }
+    }
   },
   "settings": {
     "title": "Settings",
@@ -325,7 +367,12 @@
       "generationCost": "Generation cost",
       "generationCostDesc": "Chat: 1000 tokens = 50 credits. Image 50 credits, video 300 credits",
       "freePlanScope": "Free: tests",
-      "personalScope": "Personal"
+      "personalScope": "Personal",
+      "parentCodeTitle": "Parent link code",
+      "parentCodeDesc": "Share this code with your parent. They will enter it in their dashboard to see your progress.",
+      "generatingCode": "Generating code...",
+      "codeUnavailable": "Code unavailable",
+      "expiresAt": "Valid until {date}"
     },
     "data": {
       "title": "Data controls",

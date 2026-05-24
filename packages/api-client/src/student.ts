@@ -100,6 +100,8 @@ export type StudentAnalytics = {
   questStrategy: QuestStrategy;
   integrations: IntegrationStatus[];
   aiModules: AiModuleStatus[];
+  aiAnalysisStudent?: string | null;
+  aiAnalysisParent?: string | null;
 };
 
 export type Quest = {

@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { findStudentByUserId } from "../students/students.service.js";
+import { requireStudent } from "../students/students.service.js";
 import { SUBSCRIPTION_LIMITS } from "@edtech/config";
 
 const idParamSchema = z.object({ id: z.string().uuid() });

@@ -156,17 +156,17 @@ export function AccountPanel({
           <div className="mb-2 flex items-center gap-2">
             <LinkIcon className="size-5 text-emerald-600" />
             <span className="text-base font-medium text-neutral-950">
-              Код для родителя
+              {t("settings.account.parentCodeTitle")}
             </span>
           </div>
           <p className="mb-4 text-xs text-neutral-500 leading-normal">
-            Передайте этот код родителю. Он введёт его в родительской панели и увидит ваш прогресс.
+            {t("settings.account.parentCodeDesc")}
           </p>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <code className="min-w-0 flex-1 break-all rounded-xl bg-neutral-50 border border-neutral-100 px-3 py-2 text-xs font-semibold text-neutral-900 leading-relaxed">
               {parentCodeQuery.isLoading
-                ? "Генерируем код..."
-                : parentCodeQuery.data?.code ?? "Код недоступен"}
+                ? t("settings.account.generatingCode")
+                : parentCodeQuery.data?.code ?? t("settings.account.codeUnavailable")}
             </code>
             <button
               type="button"
@@ -186,12 +186,14 @@ export function AccountPanel({
               )}
             >
               <ClipboardDocumentIcon className="size-4" />
-              {copiedCode ? "Скопировано" : "Скопировать"}
+              {copiedCode ? t("settings.account.copied") : t("settings.account.copy")}
             </button>
           </div>
           {parentCodeQuery.data?.expiresAt && (
             <p className="mt-3 text-xs text-neutral-400">
-              Действует до {new Date(parentCodeQuery.data.expiresAt).toLocaleString()}
+              {t("settings.account.expiresAt", {
+                date: new Date(parentCodeQuery.data.expiresAt).toLocaleString(),
+              })}
             </p>
           )}
           {parentCodeQuery.error && (
