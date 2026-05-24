@@ -507,7 +507,7 @@
   "upgrade": {
     "title": "Upgrade to Mixin Pro",
     "monthly": "Monthly",
-    "annually": "Annually · Save 17%",
+    "annually": "Annually • Save 20%",
     "perMonth": "/ month",
     "perMonthAnnual": "/ month, billed yearly",
     "upgradeBtn": "Upgrade",
@@ -589,7 +589,7 @@
     "videoCard": "Video",
     "creditsImmediate": "credits immediately",
     "creditsCount": "credits",
-    "creditsPerMonth": "/ month",
+    "billedYearly": "/ month, billed yearly",
     "creditsPerDayVal": "{count} credits every day",
     "creditsCountVal": "{count} credits",
     "oneCredit": "1 credit"

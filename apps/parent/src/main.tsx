@@ -144,7 +144,7 @@ function ParentShell({ children }: { children: React.ReactNode }) {
           <div className="bg-[#3d3e3a] p-4">
             <div className="inline-flex h-14 items-center gap-3 rounded-[24px] bg-[#eeeee5] px-5 text-lg font-semibold text-[#151614]">
               <SparklesIcon className="size-5" />
-              Панель
+              {t("nav.dashboard")}
             </div>
           </div>
           <ScrollArea className="h-[calc(100%-5.75rem)] space-y-2 p-4">

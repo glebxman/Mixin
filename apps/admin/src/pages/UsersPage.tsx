@@ -117,9 +117,9 @@ export function UsersPage() {
     );
   }
 
-  if (usersQuery.isLoading && !usersQuery.data) return <LoadingState />;
+  if (usersQuery.isLoading && !usersQuery.data) return <LoadingState label={t("common.loading")} />;
   if (usersQuery.error)
-    return <ErrorState message={(usersQuery.error as Error).message} />;
+    return <ErrorState title={t("common.error")} message={(usersQuery.error as Error).message} />;
 
   const data = usersQuery.data;
   const totalPages = data?.totalPages ?? 1;
@@ -260,7 +260,7 @@ export function UsersPage() {
                               onClick={() => setStatsUserId(u.id)}
                               className="rounded-full text-emerald-600 border-emerald-100 bg-emerald-50/30 hover:bg-emerald-50 hover:border-emerald-200 text-xs font-semibold px-3 py-1"
                             >
-                              Статистика
+                              {t("admin.usersPage.analyticsModal.openButton")}
                             </Button>
                           )}
                           <Button
@@ -547,7 +547,7 @@ function StudentStatsDialog({
   userId: string | null;
   onClose: () => void;
 }) {
-  const { lang } = useI18n();
+  const { t } = useI18n();
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin", "student-stats", userId],
     queryFn: () => adminApi.studentStats(userId!),
@@ -584,8 +584,12 @@ function StudentStatsDialog({
               </svg>
             </div>
             <div>
-              <h3 className="text-lg font-bold tracking-tight">Статистика и аналитика ученика</h3>
-              <p className="text-xs text-neutral-400">Детальные показатели успеваемости и отчет искусственного интеллекта</p>
+              <h3 className="text-lg font-bold tracking-tight">
+                {t("admin.usersPage.analyticsModal.title")}
+              </h3>
+              <p className="text-xs text-neutral-400">
+                {t("admin.usersPage.analyticsModal.subtitle")}
+              </p>
             </div>
           </div>
           <button
@@ -602,7 +606,9 @@ function StudentStatsDialog({
           {isLoading && (
             <div className="flex h-full flex-col items-center justify-center gap-3 py-20">
               <Spinner size="lg" className="text-emerald-500 animate-spin" />
-              <p className="text-sm font-semibold text-neutral-500">Загрузка данных успеваемости...</p>
+              <p className="text-sm font-semibold text-neutral-500">
+                {t("admin.usersPage.analyticsModal.loading")}
+              </p>
             </div>
           )}
 
@@ -613,7 +619,9 @@ function StudentStatsDialog({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h4 className="text-base font-bold text-neutral-900">Не удалось загрузить данные</h4>
+              <h4 className="text-base font-bold text-neutral-900">
+                {t("admin.usersPage.analyticsModal.loadFailedTitle")}
+              </h4>
               <p className="text-sm text-neutral-500">{(error as Error).message}</p>
             </div>
           )}
@@ -631,7 +639,9 @@ function StudentStatsDialog({
                     <h4 className="mt-4 text-lg font-bold text-neutral-900">
                       {data.analytics.profileSummary.firstName || ""} {data.analytics.profileSummary.lastName || ""}
                     </h4>
-                    <p className="text-sm text-neutral-500">{data.analytics.profileSummary.schoolName || "Школа не указана"}</p>
+                    <p className="text-sm text-neutral-500">
+                      {data.analytics.profileSummary.schoolName || t("parent.schoolNotSet")}
+                    </p>
                     
                     <div className="mt-4 flex flex-wrap justify-center gap-2">
                       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
@@ -641,7 +651,9 @@ function StudentStatsDialog({
                         {data.analytics.profileSummary.xp} XP
                       </span>
                       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-100">
-                        {data.analytics.profileSummary.grade} класс
+                        {t("admin.usersPage.analyticsModal.gradeLabel", {
+                          grade: data.analytics.profileSummary.grade,
+                        })}
                       </span>
                     </div>
                   </div>
@@ -650,7 +662,9 @@ function StudentStatsDialog({
                   <div className="py-6 space-y-4 border-b border-neutral-100 text-sm">
                     {data.analytics.profileSummary.targetProfession && (
                       <div>
-                        <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">Желаемая профессия</span>
+                        <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
+                          {t("admin.usersPage.analyticsModal.targetProfession")}
+                        </span>
                         <span className="font-semibold text-neutral-800 flex items-center gap-1.5">
                           <svg className="size-4.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -662,21 +676,30 @@ function StudentStatsDialog({
                     )}
                     {data.analytics.profileSummary.careerDirection && (
                       <div>
-                        <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">Направление</span>
+                        <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
+                          {t("admin.usersPage.analyticsModal.careerDirection")}
+                        </span>
                         <span className="font-semibold text-neutral-800">{data.analytics.profileSummary.careerDirection}</span>
                       </div>
                     )}
                     <div>
-                      <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">Квесты</span>
+                      <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
+                        {t("admin.usersPage.analyticsModal.questsLabel")}
+                      </span>
                       <span className="font-semibold text-neutral-800">
-                        Выполнено {data.analytics.completedQuests} из {data.analytics.totalQuests}
+                        {t("admin.usersPage.analyticsModal.questsDone", {
+                          done: data.analytics.completedQuests,
+                          total: data.analytics.totalQuests,
+                        })}
                       </span>
                     </div>
                   </div>
 
                   {/* Interests */}
                   <div className="pt-6">
-                    <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">Интересы</span>
+                    <span className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
+                      {t("admin.usersPage.analyticsModal.interestsLabel")}
+                    </span>
                     <div className="flex flex-wrap gap-1.5">
                       {data.analytics.profileSummary.interests && data.analytics.profileSummary.interests.length > 0 ? (
                         data.analytics.profileSummary.interests.map((interest: string) => (
@@ -685,7 +708,9 @@ function StudentStatsDialog({
                           </span>
                         ))
                       ) : (
-                        <span className="text-xs text-neutral-400 italic">Не указаны</span>
+                        <span className="text-xs text-neutral-400 italic">
+                          {t("admin.usersPage.analyticsModal.notSpecified")}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -700,7 +725,7 @@ function StudentStatsDialog({
                     <svg className="size-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                     </svg>
-                    Успеваемость по предметам
+                    {t("admin.usersPage.analyticsModal.performanceTitle")}
                   </h4>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -723,7 +748,9 @@ function StudentStatsDialog({
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-neutral-400 italic text-center py-6 col-span-2">Нет данных об успеваемости</p>
+                      <p className="text-sm text-neutral-400 italic text-center py-6 col-span-2">
+                        {t("admin.usersPage.analyticsModal.scoresEmpty")}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -734,7 +761,7 @@ function StudentStatsDialog({
                     <svg className="size-5 text-violet-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    Отчет искусственного интеллекта
+                    {t("admin.usersPage.analyticsModal.aiReport")}
                   </h4>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -742,10 +769,12 @@ function StudentStatsDialog({
                     <div className="space-y-2.5">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <h5 className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Анализ для ученика</h5>
+                        <h5 className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                          {t("admin.usersPage.analyticsModal.analysisStudent")}
+                        </h5>
                       </div>
                       <div className="rounded-2xl bg-neutral-50 p-4 border border-neutral-100 h-[220px] overflow-y-auto text-xs leading-relaxed text-neutral-600 whitespace-pre-line">
-                        {data.aiFeedback?.aiAnalysisStudent || "Анализ не сгенерирован"}
+                        {data.aiFeedback?.aiAnalysisStudent || t("admin.usersPage.analyticsModal.analysisNotGenerated")}
                       </div>
                     </div>
 
@@ -753,10 +782,12 @@ function StudentStatsDialog({
                     <div className="space-y-2.5">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-violet-500" />
-                        <h5 className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Анализ для родителей</h5>
+                        <h5 className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                          {t("admin.usersPage.analyticsModal.analysisParents")}
+                        </h5>
                       </div>
                       <div className="rounded-2xl bg-neutral-50 p-4 border border-neutral-100 h-[220px] overflow-y-auto text-xs leading-relaxed text-neutral-600 whitespace-pre-line">
-                        {data.aiFeedback?.aiAnalysisParent || "Анализ для родителей не сгенерирован"}
+                        {data.aiFeedback?.aiAnalysisParent || t("admin.usersPage.analyticsModal.analysisParentsNotGenerated")}
                       </div>
                     </div>
                   </div>
@@ -769,7 +800,7 @@ function StudentStatsDialog({
         {/* Modal Footer */}
         <div className="flex justify-end items-center px-8 py-4 border-t border-neutral-100 bg-white gap-2">
           <Button variant="outline" className="rounded-full px-5" onClick={onClose}>
-            Закрыть
+            {t("admin.usersPage.analyticsModal.close")}
           </Button>
         </div>
       </div>

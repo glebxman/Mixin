@@ -507,7 +507,7 @@
   "upgrade": {
     "title": "Mixin Pro ga oʻtish",
     "monthly": "Oylik",
-    "annually": "Yillik · 17% chegirma",
+    "annually": "Yillik • 20% chegirma",
     "perMonth": "/ oy",
     "perMonthAnnual": "/ oy, yillik toʻlov",
     "upgradeBtn": "Yangilash",
@@ -589,7 +589,7 @@
     "videoCard": "Video",
     "creditsImmediate": "darhol kreditlar",
     "creditsCount": "kreditlar",
-    "creditsPerMonth": "/ oy",
+    "billedYearly": "/ oy, yillik hisob-kitob",
     "creditsPerDayVal": "Har kuni {count} kredit",
     "creditsCountVal": "{count} kredit",
     "oneCredit": "1 kredit"

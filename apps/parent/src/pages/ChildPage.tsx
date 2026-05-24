@@ -16,16 +16,18 @@ import {
   SparklesIcon,
   TrophyIcon,
 } from "@heroicons/react/24/outline";
+import { useI18n } from "@edtech/i18n";
 
 const tabs = [
-  { label: "Динамика", icon: ChartBarIcon },
-  { label: "Визиты", icon: CalendarDaysIcon },
-  { label: "Предметы", icon: BookOpenIcon },
-  { label: "Квесты", icon: AcademicCapIcon },
-  { label: "AI", icon: LightBulbIcon },
+  { labelKey: "parent.child.tabDynamics", icon: ChartBarIcon },
+  { labelKey: "parent.child.tabVisits", icon: CalendarDaysIcon },
+  { labelKey: "parent.child.tabSubjects", icon: BookOpenIcon },
+  { labelKey: "parent.child.tabQuests", icon: AcademicCapIcon },
+  { labelKey: "parent.child.tabAi", icon: LightBulbIcon },
 ];
 
 export function ChildPage() {
+  const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
   const query = useQuery({
     queryKey: ["parent", "child", id],
@@ -33,8 +35,15 @@ export function ChildPage() {
     enabled: !!id,
   });
 
-  if (query.isLoading) return <LoadingState />;
-  if (query.error) return <ErrorState message={(query.error as Error).message} />;
+  if (query.isLoading) return <LoadingState label={t("common.loading")} />;
+  if (query.error) {
+    return (
+      <ErrorState
+        title={t("common.error")}
+        message={(query.error as Error).message}
+      />
+    );
+  }
   if (!query.data) return null;
 
   const { child, analytics } = query.data;
@@ -53,7 +62,7 @@ export function ChildPage() {
           <Link
             to="/"
             className="grid size-12 place-items-center rounded-full bg-[#f2f2ec] text-[#555651] transition hover:bg-white"
-            aria-label="На главную"
+            aria-label={t("parent.child.back")}
           >
             <ArrowLeftIcon className="size-5" />
           </Link>
@@ -69,7 +78,7 @@ export function ChildPage() {
               const Icon = tab.icon;
               return (
                 <span
-                  key={tab.label}
+                  key={tab.labelKey}
                   className={`inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium ${
                     index === 0
                       ? "bg-white text-[#1f201d]"
@@ -77,7 +86,7 @@ export function ChildPage() {
                   }`}
                 >
                   <Icon className="size-4" />
-                  {tab.label}
+                  {t(tab.labelKey)}
                 </span>
               );
             })}
@@ -91,10 +100,12 @@ export function ChildPage() {
             <div className="grid size-20 place-items-center rounded-[24px] bg-[#f0e2d8] text-3xl font-semibold text-[#343431]">
               {initials}
             </div>
-            <p className="mt-5 text-xs font-medium uppercase text-[#77786f]">Ученик</p>
+            <p className="mt-5 text-xs font-medium uppercase text-[#77786f]">
+              {t("parent.child.studentLabel")}
+            </p>
             <h2 className="mt-1 text-xl font-semibold text-[#151614]">{fullName}</h2>
             <p className="mt-3 text-sm leading-relaxed text-[#666760]">
-              {child.grade} • {child.schoolName ?? "Школа не указана"}
+              {child.grade} • {child.schoolName ?? t("parent.schoolNotSet")}
             </p>
           </aside>
 
@@ -104,25 +115,39 @@ export function ChildPage() {
               className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[#555651] hover:text-[#1f201d]"
             >
               <ArrowLeftIcon className="size-4" />
-              На главную
+              {t("parent.child.back")}
             </Link>
 
             <div className="grid gap-6 lg:grid-cols-[1fr_auto]">
               <div>
-                <p className="text-xs font-medium uppercase text-[#77786f]">Диагноз</p>
+                <p className="text-xs font-medium uppercase text-[#77786f]">
+                  {t("parent.child.diagnosis")}
+                </p>
                 <h2 className="mt-2 text-4xl font-semibold tracking-normal text-[#11120f]">
                   {fullName}
                 </h2>
                 <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#686963]">
-                  {child.grade} • {child.schoolName ?? "Школа не указана"}
+                  {child.grade} • {child.schoolName ?? t("parent.schoolNotSet")}
                 </p>
               </div>
 
               <div className="grid min-w-0 grid-cols-2 gap-5 sm:min-w-[520px] sm:grid-cols-4">
-                <Metric label="Уровень" value={child.level.toString()} />
-                <Metric label="Очки опыта" value={child.xp.toString()} />
-                <Metric label="Прогресс" value={`${analytics.overallProgress}%`} />
-                <Metric label="Серия" value={`${child.streakDays}д`} />
+                <Metric
+                  label={t("parent.metricLevel")}
+                  value={child.level.toString()}
+                />
+                <Metric
+                  label={t("parent.metricXp")}
+                  value={child.xp.toString()}
+                />
+                <Metric
+                  label={t("parent.metricProgress")}
+                  value={`${analytics.overallProgress}%`}
+                />
+                <Metric
+                  label={t("parent.metricStreak")}
+                  value={`${child.streakDays}`}
+                />
               </div>
             </div>
           </div>
@@ -130,21 +155,21 @@ export function ChildPage() {
 
         <div className="mb-6 grid gap-5 lg:grid-cols-3">
           <SoftMetric
-            label="Уровень"
+            label={t("parent.metricLevel")}
             value={child.level.toString()}
             icon={AcademicCapIcon}
             tone="violet"
           />
           <SoftMetric
-            label="Очки опыта"
+            label={t("parent.metricXp")}
             value={child.xp.toString()}
             icon={TrophyIcon}
             tone="green"
           />
           <SoftMetric
-            label="Серия дней"
+            label={t("parent.metricStreak")}
             value={child.streakDays.toString()}
-            hint="дней подряд"
+            hint={t("parent.metricStreakDays")}
             icon={FireIcon}
             tone="orange"
           />
@@ -164,13 +189,13 @@ export function ChildPage() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <ListCard
-            title="Сильные стороны"
+            title={t("parent.child.strengthsTitle")}
             icon={CheckCircleIcon}
             items={analytics.strengths}
             dot="#089567"
           />
           <ListCard
-            title="Что подтянуть"
+            title={t("parent.child.weaknessesTitle")}
             icon={LightBulbIcon}
             items={analytics.weaknesses}
             dot="#ff5b22"
@@ -226,12 +251,17 @@ function SoftMetric({
 }
 
 function SubjectPanel({ subjects }: { subjects: Array<{ subject: string; score: number }> }) {
+  const { t } = useI18n();
   return (
     <div className="rounded-[28px] border border-[#d4d4ca] bg-[#ecece2]/75 p-5">
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <p className="text-lg font-semibold text-[#20211f]">Сен</p>
-          <p className="text-xs text-[#77786f]">I неделя</p>
+          <p className="text-lg font-semibold text-[#20211f]">
+            {t("parent.child.subjectsPeriodTitle")}
+          </p>
+          <p className="text-xs text-[#77786f]">
+            {t("parent.child.subjectsPeriodSubtitle")}
+          </p>
         </div>
         <span className="grid size-10 place-items-center rounded-full bg-[#f2ff19] text-[#2e3129] shadow-[0_0_20px_rgba(242,255,25,0.75)]">
           <CalendarDaysIcon className="size-5" />
@@ -252,7 +282,9 @@ function SubjectPanel({ subjects }: { subjects: Array<{ subject: string; score: 
             </div>
             <div className="rounded-[20px] bg-[#ededdf] p-4">
               <div className="mb-3 flex items-center justify-between gap-3">
-                <span className="text-xs font-medium text-[#77786f]">Среднее</span>
+                <span className="text-xs font-medium text-[#77786f]">
+                  {t("parent.child.average")}
+                </span>
                 <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[#151614]">
                   {Math.round(subject.score)}%
                 </span>
@@ -278,14 +310,19 @@ function ActivityPanel({
   items: Array<{ day: string; minutes: number }>;
   minutes: number;
 }) {
+  const { t } = useI18n();
   const max = Math.max(1, ...items.map((item) => item.minutes));
 
   return (
     <div className="rounded-[28px] bg-white p-6 shadow-[0_18px_35px_rgba(37,38,34,0.05)]">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-[#151614]">Активность</h2>
-          <p className="mt-1 text-sm text-[#77786f]">{minutes} минут за период</p>
+          <h2 className="text-2xl font-semibold text-[#151614]">
+            {t("parent.child.activityTitle")}
+          </h2>
+          <p className="mt-1 text-sm text-[#77786f]">
+            {t("parent.child.minutesPeriod", { minutes })}
+          </p>
         </div>
         <ClockIcon className="size-6 text-[#60615b]" />
       </div>
@@ -337,6 +374,7 @@ function ListCard({
 }
 
 function ParentAiAnalysisCard({ feedback }: { feedback: string }) {
+  const { t } = useI18n();
   const paragraphs = feedback.split("\n").filter((p) => p.trim().length > 0);
 
   return (
@@ -346,8 +384,12 @@ function ParentAiAnalysisCard({ feedback }: { feedback: string }) {
           <SparklesIcon className="size-5 animate-pulse" />
         </span>
         <div>
-          <h2 className="text-xl font-bold text-[#151614]">Анализ ИИ-тьютора для родителя</h2>
-          <p className="text-xs text-[#77786f]">Индивидуальный разбор успеваемости и рекомендации по поддержке вашего ребенка</p>
+          <h2 className="text-xl font-bold text-[#151614]">
+            {t("parent.child.aiAnalysisTitle")}
+          </h2>
+          <p className="text-xs text-[#77786f]">
+            {t("parent.child.aiAnalysisDesc")}
+          </p>
         </div>
       </div>
       <div className="space-y-3 mt-4 border-t border-[#e2e2da] pt-4">

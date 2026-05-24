@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@variant dark (.dark &);
 @import "@edtech/ui/styles.css";
 
 /* Tailwind должен сканировать TSX из workspace UI-пакета. */

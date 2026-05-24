@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, EmptyState } from "@edtech/ui";
 import { LightBulbIcon } from "@heroicons/react/24/outline";
 import type { Recommendation } from "@edtech/api-client";
+import { useI18n } from "@edtech/i18n";
 
 const tone = {
   high: "border-l-rose-500 bg-rose-50/80",
@@ -15,19 +16,20 @@ const priorityDot = {
 } as const;
 
 export function RecommendationsCard({ items }: { items: Recommendation[] }) {
+  const { t } = useI18n();
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <LightBulbIcon className="size-5 text-amber-500" />
-          Рекомендации
+          {t("parent.recommendations")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
           <EmptyState
-            title="Пока нет советов"
-            description="AI готовит рекомендации. Загляните позже."
+            title={t("parent.recommendationsEmptyTitle")}
+            description={t("parent.recommendationsEmptyDesc")}
             icon={LightBulbIcon}
           />
         ) : (

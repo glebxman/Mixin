@@ -10,17 +10,18 @@ import {
   LightBulbIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
+import { useI18n } from "@edtech/i18n";
 
-const categoryMeta: Record<string, { label: string; icon: typeof LightBulbIcon }> = {
-  learning: { label: "Обучение", icon: AcademicCapIcon },
-  career: { label: "Карьера", icon: BriefcaseIcon },
-  health: { label: "Здоровье", icon: HeartIcon },
+const categoryMeta: Record<string, { labelKey: string; icon: typeof LightBulbIcon }> = {
+  learning: { labelKey: "parent.recommendationsPage.categoryLearning", icon: AcademicCapIcon },
+  career: { labelKey: "parent.recommendationsPage.categoryCareer", icon: BriefcaseIcon },
+  health: { labelKey: "parent.recommendationsPage.categoryHealth", icon: HeartIcon },
 };
 
-const priorityLabel = {
-  high: "Высокий приоритет",
-  medium: "Средний приоритет",
-  low: "Низкий приоритет",
+const priorityKey = {
+  high: "parent.recommendationsPage.priorityHigh",
+  medium: "parent.recommendationsPage.priorityMedium",
+  low: "parent.recommendationsPage.priorityLow",
 } as const;
 
 const priorityTone = {
@@ -30,19 +31,27 @@ const priorityTone = {
 } as const;
 
 export function RecommendationsPage() {
+  const { t } = useI18n();
   const query = useQuery({
     queryKey: ["parent", "recommendations"],
     queryFn: () => parentApi.recommendations(),
   });
   const [active, setActive] = useState<string | null>(null);
 
-  if (query.isLoading) return <LoadingState />;
-  if (query.error) return <ErrorState message={(query.error as Error).message} />;
+  if (query.isLoading) return <LoadingState label={t("common.loading")} />;
+  if (query.error) {
+    return (
+      <ErrorState
+        title={t("common.error")}
+        message={(query.error as Error).message}
+      />
+    );
+  }
   if (!query.data || query.data.length === 0) {
     return (
       <EmptyState
-        title="Рекомендаций пока нет"
-        description="AI готовит советы. Попробуйте позже."
+        title={t("parent.recommendationsPage.emptyTitle")}
+        description={t("parent.recommendationsPage.emptyDesc")}
         icon={LightBulbIcon}
       />
     );
@@ -50,10 +59,9 @@ export function RecommendationsPage() {
 
   const groups = query.data;
   const current = groups.find((group) => group.category === active) ?? groups[0];
-  const currentMeta = categoryMeta[current.category] ?? {
-    label: current.category,
-    icon: LightBulbIcon,
-  };
+  const currentMetaRaw = categoryMeta[current.category];
+  const currentLabel = currentMetaRaw ? t(currentMetaRaw.labelKey) : current.category;
+  const CurrentIcon = currentMetaRaw?.icon ?? LightBulbIcon;
 
   return (
     <section className="overflow-hidden rounded-[34px] border border-[#d9d9d1] bg-[#eeeee5]">
@@ -61,17 +69,15 @@ export function RecommendationsPage() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="rounded-[26px] bg-[#eeeee5] px-8 py-4">
             <h1 className="text-2xl font-semibold tracking-normal text-[#151614]">
-              Рекомендации
+              {t("parent.recommendationsPage.title")}
             </h1>
           </div>
 
           <div className="ml-auto flex flex-wrap items-center gap-2">
             {groups.map((group) => {
-              const meta = categoryMeta[group.category] ?? {
-                label: group.category,
-                icon: LightBulbIcon,
-              };
-              const Icon = meta.icon;
+              const meta = categoryMeta[group.category];
+              const label = meta ? t(meta.labelKey) : group.category;
+              const Icon = meta?.icon ?? LightBulbIcon;
               const isActive = current.category === group.category;
               return (
                 <button
@@ -85,7 +91,7 @@ export function RecommendationsPage() {
                   }`}
                 >
                   <Icon className="size-4" />
-                  {meta.label}
+                  {label}
                 </button>
               );
             })}
@@ -99,32 +105,42 @@ export function RecommendationsPage() {
             <div className="grid size-20 place-items-center rounded-[24px] bg-[#f2ff19] text-[#252621] shadow-[0_0_24px_rgba(242,255,25,0.5)]">
               <SparklesIcon className="size-9" />
             </div>
-            <p className="mt-5 text-xs font-medium uppercase text-[#77786f]">AI модуль</p>
-            <h2 className="mt-1 text-xl font-semibold text-[#151614]">Семейный план</h2>
+            <p className="mt-5 text-xs font-medium uppercase text-[#77786f]">
+              {t("parent.recommendationsPage.aiModule")}
+            </p>
+            <h2 className="mt-1 text-xl font-semibold text-[#151614]">
+              {t("parent.recommendationsPage.familyPlan")}
+            </h2>
             <p className="mt-3 text-sm leading-relaxed text-[#666760]">
-              Советы обновляются по прогрессу, интересам и учебному ритму ребёнка.
+              {t("parent.recommendationsPage.familyPlanDesc")}
             </p>
           </aside>
 
           <div className="rounded-[28px] bg-[#f5f5ed] p-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_auto]">
               <div>
-                <p className="text-xs font-medium uppercase text-[#77786f]">AI</p>
-                <h2 className="mt-2 text-4xl font-semibold tracking-normal text-[#11120f]">
-                  {currentMeta.label}
+                <p className="text-xs font-medium uppercase text-[#77786f]">
+                  {t("parent.recommendationsPage.aiBadge")}
+                </p>
+                <h2 className="mt-2 inline-flex items-center gap-3 text-4xl font-semibold tracking-normal text-[#11120f]">
+                  <CurrentIcon className="size-8 text-[#089567]" />
+                  {currentLabel}
                 </h2>
                 <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#686963]">
-                  Персональные рекомендации на основе анализа успеваемости и интересов ребёнка.
+                  {t("parent.recommendationsPage.personalDesc")}
                 </p>
               </div>
 
               <div className="grid min-w-0 grid-cols-3 gap-5 sm:min-w-[360px]">
-                <Metric label="Разделы" value={groups.length.toString()} />
                 <Metric
-                  label="Советы"
+                  label={t("parent.metricSections")}
+                  value={groups.length.toString()}
+                />
+                <Metric
+                  label={t("parent.metricTips")}
                   value={groups.reduce((sum, group) => sum + group.items.length, 0).toString()}
                 />
-                <Metric label="Фокус" value={currentMeta.label} />
+                <Metric label={t("parent.metricFocus")} value={currentLabel} />
               </div>
             </div>
           </div>
@@ -145,7 +161,7 @@ export function RecommendationsPage() {
                     <span
                       className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${priorityTone[rec.priority]}`}
                     >
-                      {priorityLabel[rec.priority]}
+                      {t(priorityKey[rec.priority])}
                     </span>
                   </div>
                   <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f2f2ec] text-[#555651]">
@@ -164,7 +180,7 @@ export function RecommendationsPage() {
           </div>
 
           <aside className="space-y-5">
-            <SummaryPanel groups={groups} activeLabel={currentMeta.label} />
+            <SummaryPanel groups={groups} activeLabel={currentLabel} />
             <StepsPanel items={current.items.map((item) => item.title)} />
           </aside>
         </div>
@@ -189,29 +205,30 @@ function SummaryPanel({
   groups: Array<{ category: string; items: unknown[] }>;
   activeLabel: string;
 }) {
+  const { t } = useI18n();
   return (
     <div className="rounded-[28px] bg-white p-5 shadow-[0_18px_35px_rgba(37,38,34,0.05)]">
       <div className="mb-5 flex items-center gap-2">
         <CheckCircleIcon className="size-5 text-[#089567]" />
-        <h2 className="text-lg font-semibold text-[#151614]">Сводка</h2>
+        <h2 className="text-lg font-semibold text-[#151614]">
+          {t("parent.recommendationsPage.summary")}
+        </h2>
       </div>
 
       <div className="space-y-3 text-sm text-[#555651]">
         <div className="flex items-center justify-between rounded-2xl bg-[#f3f3ed] px-4 py-3">
-          <span>Активный фокус</span>
+          <span>{t("parent.recommendationsPage.activeFocus")}</span>
           <span className="font-semibold text-[#151614]">{activeLabel}</span>
         </div>
         {groups.map((group) => {
-          const meta = categoryMeta[group.category] ?? {
-            label: group.category,
-            icon: LightBulbIcon,
-          };
+          const meta = categoryMeta[group.category];
+          const label = meta ? t(meta.labelKey) : group.category;
           return (
             <div
               key={group.category}
               className="flex items-center justify-between rounded-2xl bg-[#f8f8f2] px-4 py-3"
             >
-              <span>{meta.label}</span>
+              <span>{label}</span>
               <span className="font-semibold text-[#151614]">{group.items.length}</span>
             </div>
           );
@@ -222,11 +239,14 @@ function SummaryPanel({
 }
 
 function StepsPanel({ items }: { items: string[] }) {
+  const { t } = useI18n();
   return (
     <div className="rounded-[28px] bg-white p-5 shadow-[0_18px_35px_rgba(37,38,34,0.05)]">
       <div className="mb-5 flex items-center gap-2">
         <SparklesIcon className="size-5 text-[#555651]" />
-        <h2 className="text-lg font-semibold text-[#151614]">Ближайшие шаги</h2>
+        <h2 className="text-lg font-semibold text-[#151614]">
+          {t("parent.recommendationsPage.nextSteps")}
+        </h2>
       </div>
 
       <ul className="space-y-3 text-sm text-[#555651]">

@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { parentApi } from "@edtech/api-client";
 import { EmptyState, ErrorState, LoadingState, Spinner } from "@edtech/ui";
 import { LinkIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { useI18n } from "@edtech/i18n";
 import { ChildSelector } from "@/components/ChildSelector";
 import { ChildOverview } from "@/components/ChildOverview";
 
 export function DashboardPage() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [linkCode, setLinkCode] = useState("");
@@ -38,9 +40,16 @@ export function DashboardPage() {
     },
   });
 
-  if (childrenQuery.isLoading) return <LoadingState label="Загружаем данные..." />;
+  if (childrenQuery.isLoading) {
+    return <LoadingState label={t("parent.loadingChildren")} />;
+  }
   if (childrenQuery.error) {
-    return <ErrorState message={(childrenQuery.error as Error).message} />;
+    return (
+      <ErrorState
+        title={t("common.error")}
+        message={(childrenQuery.error as Error).message}
+      />
+    );
   }
 
   const children = childrenQuery.data ?? [];
@@ -58,8 +67,8 @@ export function DashboardPage() {
 
       {!hasChildren ? (
         <EmptyState
-          title="У вас пока нет привязанных детей"
-          description="Попросите ребёнка открыть профиль и отправить вам код для привязки."
+          title={t("parent.noChildrenTitle")}
+          description={t("parent.noChildrenDesc")}
           icon={UserGroupIcon}
         />
       ) : (
@@ -76,7 +85,10 @@ export function DashboardPage() {
             </div>
           )}
           {overviewQuery.error && (
-            <ErrorState message={(overviewQuery.error as Error).message} />
+            <ErrorState
+              title={t("common.error")}
+              message={(overviewQuery.error as Error).message}
+            />
           )}
           {overviewQuery.data && <ChildOverview overview={overviewQuery.data} />}
         </>
@@ -98,6 +110,7 @@ function LinkChildPanel({
   error: unknown;
   onSubmit: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <form
       onSubmit={(event) => {
@@ -110,17 +123,17 @@ function LinkChildPanel({
         <div>
           <div className="mb-2 flex items-center gap-2">
             <LinkIcon className="size-5 text-[#089567]" />
-            <h2 className="text-xl font-semibold text-[#151614]">Привязать ребёнка</h2>
+            <h2 className="text-xl font-semibold text-[#151614]">
+              {t("parent.linkChildTitle")}
+            </h2>
           </div>
-          <p className="text-sm text-[#666760]">
-            Введите код из профиля ученика. После привязки прогресс появится в панели родителя.
-          </p>
+          <p className="text-sm text-[#666760]">{t("parent.linkChildDesc")}</p>
         </div>
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
           <input
             value={code}
             onChange={(event) => onCodeChange(event.target.value)}
-            placeholder="Код ребёнка"
+            placeholder={t("parent.linkCodePlaceholder")}
             className="h-12 min-w-0 rounded-full border border-[#d4d4ca] bg-white px-5 text-sm font-medium text-[#151614] outline-none transition focus:border-[#3d3e3a] sm:w-[360px]"
           />
           <button
@@ -128,7 +141,7 @@ function LinkChildPanel({
             disabled={isPending || !code.trim()}
             className="h-12 rounded-full bg-[#3d3e3a] px-6 text-sm font-semibold text-white transition hover:bg-[#252621] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isPending ? "Привязываем..." : "Привязать"}
+            {isPending ? t("parent.linking") : t("parent.linkAction")}
           </button>
         </div>
       </div>

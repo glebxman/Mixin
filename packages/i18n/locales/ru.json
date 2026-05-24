@@ -507,7 +507,7 @@
   "upgrade": {
     "title": "Улучшение до Mixin Pro",
     "monthly": "Ежемесячно",
-    "annually": "Ежегодно · Скидка 17%",
+    "annually": "Ежегодно • Скидка 20%",
     "perMonth": "/ месяц",
     "perMonthAnnual": "/ мес., оплата за год",
     "upgradeBtn": "Улучшить",
@@ -589,7 +589,7 @@
     "videoCard": "Видео",
     "creditsImmediate": "кредитов сразу",
     "creditsCount": "кредитов",
-    "creditsPerMonth": "/ месяц",
+    "billedYearly": "в месяц, при оплате за год",
     "creditsPerDayVal": "{count} кредитов каждый день",
     "creditsCountVal": "{count} кредитов",
     "oneCredit": "1 кредит"
