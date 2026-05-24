@@ -11,6 +11,7 @@ import {
   encodeStreamEvent,
   enforceChatRateLimit,
   getStudentFirstName,
+  getStudentLearningContext,
   loadOrCreateSession,
   persistChatTurn,
   resolveStudentAndUser,
@@ -51,13 +52,18 @@ export async function aiRoutes(app: FastifyInstance) {
 
       let aiResult: AIServiceResponse;
       try {
-        const studentFirstName = await getStudentFirstName(app, userId);
+        const [studentFirstName, learningCtx] = await Promise.all([
+          getStudentFirstName(app, userId),
+          getStudentLearningContext(app, userId, su.studentId),
+        ]);
         aiResult = await callAIService({
           studentId: su.studentId,
           sessionId: session.id,
           payload,
           history,
           studentFirstName,
+          studentLanguage: learningCtx.language,
+          studentGrade: learningCtx.grade,
         });
       } catch (err) {
         const status = (err as Error & { status?: number }).status;
@@ -129,6 +135,7 @@ export async function aiRoutes(app: FastifyInstance) {
       if (!(await consumeChatCredits(app, userId, su.subscriptionPlan, reply))) return;
 
       const studentFirstName = await getStudentFirstName(app, userId);
+      const learningCtx = await getStudentLearningContext(app, userId, su.studentId);
       const sessionId = session.id;
       const studentId = su.studentId;
 
@@ -142,6 +149,8 @@ export async function aiRoutes(app: FastifyInstance) {
             payload,
             history,
             studentFirstName,
+            studentLanguage: learningCtx.language,
+            studentGrade: learningCtx.grade,
           });
           const finalReply = aiResult.reply || "";
 

@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { studentApi } from "@edtech/api-client";
 import {
   CalendarDaysIcon,
   QuestionMarkCircleIcon,
   SparklesIcon,
+  LinkIcon,
+  ClipboardDocumentIcon,
 } from "@heroicons/react/24/outline";
 import { Avatar, cn } from "@edtech/ui";
 import { useI18n } from "@edtech/i18n";
@@ -27,7 +31,13 @@ export function AccountPanel({
 }) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+
+  const parentCodeQuery = useQuery({
+    queryKey: ["student", "parent-link-code"],
+    queryFn: () => studentApi.parentLinkCode(),
+  });
 
   const userId = providedUserId || "—";
 
@@ -140,6 +150,55 @@ export function AccountPanel({
               </p>
             </div>
           </div>
+        </div>
+
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+          <div className="mb-2 flex items-center gap-2">
+            <LinkIcon className="size-5 text-emerald-600" />
+            <span className="text-base font-medium text-neutral-950">
+              Код для родителя
+            </span>
+          </div>
+          <p className="mb-4 text-xs text-neutral-500 leading-normal">
+            Передайте этот код родителю. Он введёт его в родительской панели и увидит ваш прогресс.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <code className="min-w-0 flex-1 break-all rounded-xl bg-neutral-50 border border-neutral-100 px-3 py-2 text-xs font-semibold text-neutral-900 leading-relaxed">
+              {parentCodeQuery.isLoading
+                ? "Генерируем код..."
+                : parentCodeQuery.data?.code ?? "Код недоступен"}
+            </code>
+            <button
+              type="button"
+              disabled={!parentCodeQuery.data?.code}
+              onClick={() => {
+                if (parentCodeQuery.data?.code) {
+                  void navigator.clipboard?.writeText(parentCodeQuery.data.code);
+                  setCopiedCode(true);
+                  setTimeout(() => setCopiedCode(false), 1500);
+                }
+              }}
+              className={cn(
+                "h-8 rounded-xl border px-3 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shrink-0",
+                copiedCode
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
+              )}
+            >
+              <ClipboardDocumentIcon className="size-4" />
+              {copiedCode ? "Скопировано" : "Скопировать"}
+            </button>
+          </div>
+          {parentCodeQuery.data?.expiresAt && (
+            <p className="mt-3 text-xs text-neutral-400">
+              Действует до {new Date(parentCodeQuery.data.expiresAt).toLocaleString()}
+            </p>
+          )}
+          {parentCodeQuery.error && (
+            <p className="mt-3 text-xs text-[#e92554]">
+              {(parentCodeQuery.error as Error).message}
+            </p>
+          )}
         </div>
 
         <div>

@@ -45,13 +45,6 @@ export function SidebarHeader({
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="grid size-10 place-items-center rounded-full bg-white text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-950"
-          aria-label={t("aria.search")}
-        >
-          <MagnifyingGlassIcon className="size-5 stroke-[1.8]" />
-        </button>
-        <button
-          type="button"
           onClick={onToggle}
           className="grid size-10 place-items-center rounded-full bg-white text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-950"
           aria-label={t("aria.menuCollapse")}

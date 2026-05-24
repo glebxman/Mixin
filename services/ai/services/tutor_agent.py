@@ -16,6 +16,7 @@ import re
 from typing import Optional
 
 from .llm_service import chat as llm_chat
+from .rag_service import format_context_block, retrieve_context
 from .tutor_state import (
     SessionState,
     TutorStateStore,
@@ -255,6 +256,8 @@ async def chat_with_tutor(
     history: list[dict[str, str]] | None = None,
     student_id: str = "current",
     student_first_name: str | None = None,
+    language: str | None = None,
+    grade: int | None = None,
 ) -> dict:
     state = await _store().load(session_id)
 
@@ -263,6 +266,16 @@ async def chat_with_tutor(
     if student_first_name.strip():
         name = student_first_name.strip().split()[0]  # Только первое имя
         system += f"\n\nИмя ученика: {name}. Можешь обращаться по имени, но не в каждом сообщении — чередуй."
+
+    # RAG: ищем контекст в учебниках. Если нашли — добавляем в system prompt.
+    # Никогда не падаем: при ошибке RAG возвращает [].
+    rag_hits = retrieve_context(
+        message,
+        language=language,
+        grade=grade,
+    )
+    if rag_hits:
+        system += "\n\n" + format_context_block(rag_hits)
 
     raw = await llm_chat(
         student_id=student_id,

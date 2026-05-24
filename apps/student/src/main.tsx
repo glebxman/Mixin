@@ -19,10 +19,6 @@ const AuthPage = lazy(() =>
 const AnalyticsPage = lazy(() =>
   import("./pages/AnalyticsPage").then((m) => ({ default: m.AnalyticsPage })),
 );
-const ProfilePage = lazy(() =>
-  import("./pages/ProfilePage").then((m) => ({ default: m.ProfilePage })),
-);
-
 // Init theme before first render to avoid FOUC
 applyStoredTheme();
 
@@ -91,14 +87,6 @@ function App() {
             element={
               <ShellRoute>
                 <AnalyticsPage />
-              </ShellRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ShellRoute>
-                <ProfilePage />
               </ShellRoute>
             }
           />

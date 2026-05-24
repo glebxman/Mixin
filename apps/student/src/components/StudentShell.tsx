@@ -6,18 +6,16 @@ import { useI18n } from "@edtech/i18n";
 import {
   ChartBarIcon,
   ChatBubbleLeftRightIcon,
-  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { clearChatsStorage } from "@/hooks/useChats";
 
 const NAV = [
   { to: "/", labelKey: "nav.chat", icon: ChatBubbleLeftRightIcon, end: true },
   { to: "/analytics", labelKey: "nav.analytics", icon: ChartBarIcon },
-  { to: "/profile", labelKey: "nav.profile", icon: UserCircleIcon },
 ] as const;
 
 /**
- * StudentShell — layout для не-чатовых страниц студента (analytics/profile).
+ * StudentShell — layout для не-чатовых страниц студента (analytics).
  * Чат держит свой собственный sidebar в стиле ChatGPT (см. ChatSidebar).
  */
 export function StudentShell({ children }: { children: React.ReactNode }) {

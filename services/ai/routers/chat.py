@@ -29,6 +29,8 @@ class ChatRequest(BaseModel):
     subject_id: Optional[str] = None
     history: list[ChatHistoryMessage] = Field(default_factory=list, max_length=48)
     student_first_name: Optional[str] = None
+    student_language: Optional[str] = None
+    student_grade: Optional[int] = None
     images: list[dict] = Field(default_factory=list, max_length=1)
 
 
@@ -89,6 +91,8 @@ async def chat(
         history=[m.model_dump() for m in request.history],
         student_id=request.student_id,
         student_first_name=request.student_first_name,
+        language=request.student_language,
+        grade=request.student_grade,
     )
     return ChatResponse(**result)
 

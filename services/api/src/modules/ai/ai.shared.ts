@@ -236,6 +236,8 @@ export type AIServiceCallInput = {
   payload: ChatPayload;
   history: StoredMessage[];
   studentFirstName: string | null;
+  studentLanguage: string | null;
+  studentGrade: number | null;
 };
 
 export async function callAIService(
@@ -257,6 +259,8 @@ export async function callAIService(
       subject_id: input.payload.subjectId ?? null,
       history: input.history,
       student_first_name: input.studentFirstName,
+      student_language: input.studentLanguage ?? null,
+      student_grade: input.studentGrade ?? null,
       images: input.payload.images ?? [],
     }),
     signal: AbortSignal.timeout(120_000),
@@ -317,6 +321,38 @@ export async function getStudentFirstName(
     select: { firstName: true },
   });
   return profile?.firstName ?? null;
+}
+
+export async function getStudentLearningContext(
+  app: FastifyInstance,
+  userId: string,
+  studentId: string,
+): Promise<{ language: string | null; grade: number | null }> {
+  const [profile, student] = await Promise.all([
+    app.prisma.profile.findFirst({
+      where: { userId },
+      select: { language: true },
+    }),
+    app.prisma.studentProfile.findUnique({
+      where: { id: studentId },
+      select: { grade: true },
+    }),
+  ]);
+
+  // Profile.language: "ru" | "uz" | "en" — RAG корпус ru/uz, en маппим к ru.
+  let language: string | null = profile?.language ?? null;
+  if (language === "en") language = "ru";
+  if (language && !["ru", "uz"].includes(language)) language = null;
+
+  // StudentProfile.grade хранится как "G7"; RAG ждёт целое 1..11.
+  let grade: number | null = null;
+  const raw = student?.grade as string | undefined;
+  if (raw && raw.startsWith("G")) {
+    const n = Number(raw.slice(1));
+    if (Number.isFinite(n) && n >= 1 && n <= 11) grade = n;
+  }
+
+  return { language, grade };
 }
 
 export function encodeStreamEvent(event: unknown): string {

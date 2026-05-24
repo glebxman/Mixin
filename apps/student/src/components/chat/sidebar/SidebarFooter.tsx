@@ -31,8 +31,10 @@ export function SidebarFooter({
         <button
           className="grid size-11 place-items-center rounded-full hover:bg-neutral-100"
           type="button"
+          onClick={onOpenProfile}
+          aria-label={t("common.profile")}
         >
-          <RectangleGroupIcon className="size-5 stroke-[1.8]" />
+          <Avatar name={userName} size="sm" />
         </button>
         <button
           className="grid size-11 place-items-center rounded-full hover:bg-neutral-100"
