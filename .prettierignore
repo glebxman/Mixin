@@ -1,0 +1,16 @@
+node_modules
+**/node_modules
+dist
+**/dist
+.next
+**/.next
+.turbo
+**/.turbo
+.venv
+**/.venv
+pnpm-lock.yaml
+**/*.tsbuildinfo
+coverage
+**/coverage
+services/ai/.venv
+services/ai/**/__pycache__

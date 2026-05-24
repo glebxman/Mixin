@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "noEmit": true,
+    "paths": {
+      "@edtech/db": ["../../packages/db/index.ts"],
+      "@edtech/types": ["../../packages/types/index.ts"],
+      "@edtech/config": ["../../packages/config/index.ts"]
+    }
+  },
+  "include": ["src", "../../packages/db/index.ts", "../../packages/types/index.ts", "../../packages/config/index.ts"]
+}

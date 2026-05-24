@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+/**
+ * @edtech/ui — единая дизайн-система Mixin EdTech UZ.
+ *
+ * Все 4 фронта (student, parent, school, admin) импортируют этот файл
+ * через свой src/index.css. Здесь живут:
+ *   • design tokens (palette, radius)
+ *   • keyframes анимаций
+ *   • утилитарные классы (animate-*, card-hover, stagger-children и т.д.)
+ *   • базовые стили html/body
+ *
+ * @source ниже подключают TSX-файлы UI-пакета, чтобы Tailwind v4
+ * сгенерировал классы, используемые внутри @edtech/ui (Button, Card и пр.).
+ */
+
+@source "../ui/components";
+@source "../ui/lib";
+
+@theme {
+  /* ─── Анимации ───────────────────────────────────────────── */
+  --animate-fade-in: fadeIn 0.4s ease-out both;
+  --animate-fade-in-up: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-slide-up: slideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-scale-in: scaleIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-pulse-soft: pulseSoft 2s ease-in-out infinite;
+  --animate-blink: blink 1.4s ease-in-out infinite;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translate3d(0, 12px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+  @keyframes slideUp {
+    from { transform: translate3d(0, 100%, 0); }
+    to { transform: translate3d(0, 0, 0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes pulseSoft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
+  @keyframes thinkingDot {
+    0%, 100% { opacity: 0.35; transform: translateY(0) scale(0.9); }
+    45% { opacity: 1; transform: translateY(-4px) scale(1); }
+  }
+}
+
+/* ─── Утилитные классы для анимаций ───────────────────────── */
+
+@utility animate-fade-in {
+  animation: var(--animate-fade-in);
+}
+@utility animate-fade-in-up {
+  animation: var(--animate-fade-in-up);
+}
+@utility animate-slide-up {
+  animation: var(--animate-slide-up);
+}
+@utility animate-scale-in {
+  animation: var(--animate-scale-in);
+}
+@utility animate-shimmer {
+  animation: var(--animate-shimmer);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.05) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background-size: 200% 100%;
+}
+@utility animate-pulse-soft {
+  animation: var(--animate-pulse-soft);
+}
+
+/* Hover-lift для интерактивных карточек. */
+@utility card-hover {
+  transition:
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 200ms ease;
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgb(212 212 212);
+  }
+}
+
+/* Градиент для нижней зоны чата (как у ChatGPT). */
+@utility chat-gradient-mask {
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.92) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+/* Skeleton-блоки для placeholder-загрузки. */
+@utility skeleton {
+  background-color: rgb(245 245 245);
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.06) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+  border-radius: 0.5rem;
+}
+
+/* Stagger: дети появляются по очереди с задержкой. */
+@utility stagger-children {
+  & > * { animation: var(--animate-fade-in-up); }
+  & > *:nth-child(1) { animation-delay: 40ms; }
+  & > *:nth-child(2) { animation-delay: 80ms; }
+  & > *:nth-child(3) { animation-delay: 120ms; }
+  & > *:nth-child(4) { animation-delay: 160ms; }
+  & > *:nth-child(5) { animation-delay: 200ms; }
+  & > *:nth-child(6) { animation-delay: 240ms; }
+  & > *:nth-child(7) { animation-delay: 280ms; }
+  & > *:nth-child(8) { animation-delay: 320ms; }
+}
+
+/* ─── Базовые стили ─────────────────────────────────────── */
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  background: #f7f7f8;
+  color: #0a0a0a;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,344 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ────────────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  PARENT
+  SUPER_ADMIN
+}
+
+enum Grade {
+  G1
+  G2
+  G3
+  G4
+  G5
+  G6
+  G7
+  G8
+  G9
+  G10
+  G11
+}
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PREMIUM
+}
+
+enum QuestDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum QuestStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  ACHIEVEMENT
+  REMINDER
+  SYSTEM
+  PARENT_REPORT
+}
+
+// ─── ПОЛЬЗОВАТЕЛИ ────────────────────────────────────────────
+
+model User {
+  id               String           @id @default(uuid())
+  email            String           @unique
+  passwordHash     String
+  role             Role             @default(STUDENT)
+  subscriptionPlan SubscriptionPlan @default(FREE)
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+
+  profile        Profile?
+  sessions       Session[]
+  studentProfile StudentProfile?
+  parentProfile  ParentProfile?
+  notifications  Notification[]
+  payments       Payment[]
+
+  @@index([email])
+  @@index([role])
+  @@index([deletedAt])
+}
+
+model Profile {
+  id         String  @id @default(uuid())
+  userId     String  @unique
+  firstName  String
+  lastName   String
+  avatarUrl  String?
+  phone      String?
+  language   String  @default("ru") // ru | uz | en
+
+  user       User    @relation(fields: [userId], references: [id])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  userAgent    String?
+  ip           String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([refreshToken])
+}
+
+// ─── УЧЕНИК ──────────────────────────────────────────────────
+
+model StudentProfile {
+  id                String    @id @default(uuid())
+  userId            String    @unique
+  grade             Grade
+  age               Int?
+  schoolName        String?   // название школы (текстовое поле из онбординга)
+  interests         String[]
+  favoriteSubjects  String[]  // любимые предметы из онбординга
+  targetProfession  String?
+  careerDirection   String?   // направление карьеры из онбординга
+  xp                Int       @default(0)
+  level             Int       @default(1)
+  streakDays        Int       @default(0)
+  lastActiveAt      DateTime?
+  onboardingComplete Boolean   @default(false)
+
+  user             User                 @relation(fields: [userId], references: [id])
+  subjectProgress  SubjectProgress[]
+  questProgress    QuestProgress[]
+  aiSessions       AiSession[]
+  achievements     StudentAchievement[]
+  recommendations  CareerRecommendation[]
+  parentLinks      ParentStudentLink[]
+
+  @@index([grade])
+  @@index([onboardingComplete])
+}
+
+model ParentProfile {
+  id       String @id @default(uuid())
+  userId   String @unique
+
+  user     User                @relation(fields: [userId], references: [id])
+  children ParentStudentLink[]
+}
+
+model ParentStudentLink {
+  id        String @id @default(uuid())
+  parentId  String
+  studentId String
+
+  parent    ParentProfile  @relation(fields: [parentId], references: [id])
+  student   StudentProfile @relation(fields: [studentId], references: [id])
+
+  @@unique([parentId, studentId])
+}
+
+
+
+// ─── ПРЕДМЕТЫ И ПРОГРЕСС ─────────────────────────────────────
+
+model Subject {
+  id     String @id @default(uuid())
+  slug   String @unique // math | physics | uzbek | biology | history ...
+  nameRu String
+  nameUz String
+  icon   String?
+
+  topics          Topic[]
+  subjectProgress SubjectProgress[]
+}
+
+model Topic {
+  id          String  @id @default(uuid())
+  subjectId   String
+  nameRu      String
+  nameUz      String
+  grade       Grade
+  order       Int
+  qdrantDocId String? // ссылка на чанки в Qdrant
+
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+  quests      Quest[]
+
+  @@index([subjectId, grade])
+}
+
+model SubjectProgress {
+  id           String    @id @default(uuid())
+  studentId    String
+  subjectId    String
+  score        Float     @default(0) // 0.0 — 100.0
+  weakTopics   String[]  // id слабых тем
+  lastSyncedAt DateTime?
+
+  student      StudentProfile @relation(fields: [studentId], references: [id])
+  subject      Subject        @relation(fields: [subjectId], references: [id])
+
+  @@unique([studentId, subjectId])
+  @@index([studentId])
+}
+
+// ─── КВЕСТЫ ──────────────────────────────────────────────────
+
+model Quest {
+  id          String          @id @default(uuid())
+  topicId     String
+  grade       Grade
+  nameRu      String
+  nameUz      String
+  description String
+  difficulty  QuestDifficulty
+  xpReward    Int             @default(50)
+  timeLimit   Int?            // минуты
+  content     Json            // задания, вопросы, кейсы
+
+  topic        Topic           @relation(fields: [topicId], references: [id])
+  progress     QuestProgress[]
+
+  @@index([topicId, grade])
+  @@index([difficulty])
+}
+
+model QuestProgress {
+  id          String      @id @default(uuid())
+  studentId   String
+  questId     String
+  status      QuestStatus @default(NOT_STARTED)
+  score       Float?
+  startedAt   DateTime?
+  completedAt DateTime?
+  attempts    Int         @default(0)
+
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+  quest       Quest          @relation(fields: [questId], references: [id])
+
+  @@unique([studentId, questId])
+  @@index([studentId, status])
+}
+
+// ─── AI-СЕССИИ ───────────────────────────────────────────────
+
+model AiSession {
+  id         String   @id @default(uuid())
+  studentId  String
+  subjectId  String?
+  title      String   @default("")
+  messages   Json     // [{role, content, timestamp}]
+  tokensUsed Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  student    StudentProfile @relation(fields: [studentId], references: [id])
+
+  @@index([studentId])
+  @@index([createdAt])
+}
+
+// ─── ДОСТИЖЕНИЯ ──────────────────────────────────────────────
+
+model Achievement {
+  id          String @id @default(uuid())
+  slug        String @unique
+  nameRu      String
+  nameUz      String
+  description String
+  icon        String
+  xpBonus     Int    @default(0)
+
+  students    StudentAchievement[]
+}
+
+model StudentAchievement {
+  id            String   @id @default(uuid())
+  studentId     String
+  achievementId String
+  earnedAt      DateTime @default(now())
+
+  student       StudentProfile @relation(fields: [studentId], references: [id])
+  achievement   Achievement    @relation(fields: [achievementId], references: [id])
+
+  @@unique([studentId, achievementId])
+}
+
+// ─── КАРЬЕРНЫЕ РЕКОМЕНДАЦИИ ──────────────────────────────────
+
+model CareerRecommendation {
+  id          String   @id @default(uuid())
+  studentId   String
+  profession  String
+  university  String?
+  matchScore  Float    // 0.0 — 1.0
+  reasoning   String
+  generatedAt DateTime @default(now())
+
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+
+  @@index([studentId])
+}
+
+// ─── УВЕДОМЛЕНИЯ ─────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  titleRu   String
+  bodyRu    String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+}
+
+// ─── ПОДПИСКИ И ПЛАТЕЖИ ──────────────────────────────────────
+
+model Payment {
+  id           String           @id @default(uuid())
+  userId       String
+  plan         SubscriptionPlan
+  amount       Int              // в тийинах
+  currency     String           @default("UZS")
+  status       PaymentStatus    @default(PENDING)
+  provider     String           // payme | uzum
+  providerTxId String?          @unique
+  createdAt    DateTime         @default(now())
+  paidAt       DateTime?
+
+  user         User             @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([providerTxId])
+}

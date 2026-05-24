@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "paths": {
+      "@edtech/db": ["./packages/db/index.ts"],
+      "@edtech/types": ["./packages/types/index.ts"],
+      "@edtech/ui": ["./packages/ui/index.ts"],
+      "@edtech/config": ["./packages/config/index.ts"],
+      "@edtech/api-client": ["./packages/api-client/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist", ".next"]
+}

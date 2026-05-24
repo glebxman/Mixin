@@ -1,0 +1,407 @@
+@import "tailwindcss";
+@import "@edtech/ui/styles.css";
+
+/* Tailwind должен сканировать TSX из workspace UI-пакета. */
+@source "../../../packages/ui/components";
+
+@theme {
+  --color-card: #ffffff;
+  --color-foreground: #171717;
+  --color-muted-foreground: #737373;
+}
+
+/* Базовые стили для viewport */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg-app);
+}
+
+.student-app-frame {
+  background: var(--bg-app) !important;
+}
+
+.student-main-surface {
+  border: 1px solid transparent;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+@keyframes thinking-dot-wave {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0) scale(0.82);
+    opacity: 0.42;
+  }
+  40% {
+    transform: translateY(-7px) scale(1.18);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer-glow {
+  0% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0));
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.45));
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0));
+  }
+}
+
+@keyframes mixin-thinking-shape {
+  0% {
+    border-radius: 9999px;
+    transform: rotate(0deg) scale(1);
+  }
+  24% {
+    border-radius: 36% 64% 45% 55%;
+    transform: rotate(135deg) scale(1.12);
+  }
+  50% {
+    border-radius: 22%;
+    transform: rotate(-90deg) scale(0.96);
+  }
+  74% {
+    border-radius: 58% 42% 64% 36%;
+    transform: rotate(210deg) scale(1.08);
+  }
+  100% {
+    border-radius: 9999px;
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes image-simple-progress {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+.thinking-dot {
+  animation: thinking-dot-wave 1.05s ease-in-out infinite;
+}
+
+.mixin-thinking-shape {
+  background:
+    radial-gradient(circle at 30% 28%, #ffffff 0 9%, transparent 10%),
+    conic-gradient(from 140deg, #6084ff, #7f9cff, #171717, #6084ff);
+  animation: mixin-thinking-shape 1.65s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  will-change: border-radius, transform;
+}
+
+.image-generation-progress {
+  animation: image-simple-progress 1.15s ease-in-out infinite;
+  will-change: transform;
+}
+
+.thinking-label-glow {
+  background: linear-gradient(90deg, #737373, #171717, #10b981, #171717, #737373);
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-glow 2s ease-in-out infinite;
+}
+
+/* ─── Скрытие вертикального скроллбара ──────────────────── */
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+html, body, #root, * {
+  -ms-overflow-style: none !important;  /* IE/Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+/* ─── Система тем (Light / Dark) ─────────────────────────── */
+:root {
+  --bg-app: #f4f5f6;
+  --bg-sidebar: #ffffff;
+  --bg-main: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --text-main: #0a0a0a;
+  --text-muted: #737373;
+  --border-main: rgba(229, 229, 229, 0.7);
+  --border-card: rgba(255, 255, 255, 0.8);
+  --bg-hover: #f4f5f6;
+  --bg-active: #171717;
+  --text-active: #ffffff;
+  --bg-nested-card: #f9fafb;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg-app: #0d0d0f;
+  --bg-sidebar: #161619;
+  --bg-main: #121214;
+  --bg-card: #1c1c1f;
+  --bg-input: #1e1e22;
+  --text-main: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --border-main: rgba(63, 63, 70, 0.4);
+  --border-card: rgba(63, 63, 70, 0.5);
+  --bg-hover: #222227;
+  --bg-active: #f4f4f5;
+  --text-active: #18181b;
+  --bg-nested-card: #27272a;
+}
+
+/* Применение переменных */
+body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+}
+
+.student-app-frame {
+  background-color: var(--bg-app) !important;
+}
+
+.student-main-surface, .student-shell-main {
+  background-color: var(--bg-main) !important;
+  border-color: var(--border-main) !important;
+}
+
+aside {
+  background-color: var(--bg-sidebar) !important;
+  border-color: var(--border-main) !important;
+  color: var(--text-main) !important;
+}
+
+aside button, aside a {
+  color: var(--text-main) !important;
+}
+
+aside button:hover, aside a:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+aside .bg-neutral-950 {
+  background-color: var(--bg-active) !important;
+  color: var(--text-active) !important;
+}
+
+aside .text-neutral-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Карточки и статистика */
+.rounded-\[28px\], [class*="Card"], [class*="card"] {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-card) !important;
+  color: var(--text-main) !important;
+}
+
+.card-hover {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-card) !important;
+}
+
+/* Полное перекрытие всех светлых фонов в темной теме */
+.dark .bg-white,
+.dark .bg-\[\#ffffff\],
+.dark [class*="bg-white"] {
+  background-color: var(--bg-card) !important;
+}
+
+.dark .bg-neutral-100,
+.dark .bg-neutral-50,
+.dark .bg-\[\#f2f4f5\],
+.dark .bg-\[\#f4f5f6\],
+.dark .bg-\[\#f8f9fa\],
+.dark .bg-neutral-50\/70,
+.dark .bg-violet-50\/70 {
+  background-color: var(--bg-hover) !important;
+}
+
+.dark .border-neutral-100 {
+  border-color: var(--border-main) !important;
+}
+
+/* Специфические цвета текста в темной теме */
+.dark .text-neutral-950,
+.dark .text-neutral-900,
+.dark .text-neutral-800,
+.dark .text-neutral-700,
+.dark .text-neutral-600 {
+  color: var(--text-main) !important;
+}
+
+.dark .text-neutral-500,
+.dark .text-neutral-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Инпуты */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-main) !important;
+  color: var(--text-main) !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #6084ff !important;
+}
+
+/* Модальные окна и меню */
+.dark [role="dialog"],
+.dark [role="menu"],
+.dark .bg-white {
+  background-color: var(--bg-sidebar) !important;
+  color: var(--text-main) !important;
+}
+
+.dark [role="dialog"] header,
+.dark [role="dialog"] footer,
+.dark [role="dialog"] .border-t,
+.dark [role="dialog"] .border-b,
+.dark [role="dialog"] .border-neutral-100,
+.dark [role="menu"] .border-t,
+.dark [role="menu"] .border-neutral-100 {
+  border-color: var(--border-main) !important;
+}
+
+.dark [role="dialog"] .bg-neutral-50,
+.dark [role="dialog"] .bg-[#f2f4f5],
+.dark [role="menu"] .bg-[#f2f4f5] {
+  background-color: var(--bg-hover) !important;
+}
+
+.dark [role="dialog"] input,
+.dark [role="dialog"] select {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-main) !important;
+  color: var(--text-main) !important;
+}
+
+/* Аватар */
+.dark .bg-neutral-200 {
+  background-color: var(--bg-hover) !important;
+}
+
+/* Логотип: инверсия черного логотипа для темной темы */
+.dark img[src*="logo_black"] {
+  filter: invert(1) !important;
+}
+
+/* Все состояния наведения и фокуса для кнопок, ссылок и элементов меню */
+.dark button:hover,
+.dark a:hover,
+.dark [role="menuitem"]:hover,
+.dark [role="menuitemradio"]:hover,
+.dark [class*="hover:bg-neutral-100"]:hover,
+.dark [class*="hover:bg-neutral-50"]:hover,
+.dark [class*="hover:bg-white"]:hover,
+.dark button:focus,
+.dark button:focus-visible,
+.dark a:focus,
+.dark a:focus-visible,
+.dark [role="menuitem"]:focus,
+.dark [role="menuitemradio"]:focus,
+.dark [aria-expanded="true"] {
+  background-color: var(--bg-hover) !important;
+  color: var(--text-main) !important;
+}
+
+.dark button:hover *,
+.dark a:hover *,
+.dark [role="menuitem"]:hover *,
+.dark [role="menuitemradio"]:hover *,
+.dark [aria-expanded="true"] * {
+  color: var(--text-main) !important;
+}
+
+/* Градиентные маски и скелетоны в темной теме */
+.dark .chat-gradient-mask {
+  background: linear-gradient(
+    to top,
+    rgba(18, 18, 20, 1) 0%,
+    rgba(18, 18, 20, 0.92) 60%,
+    rgba(18, 18, 20, 0) 100%
+  ) !important;
+}
+
+.dark .skeleton {
+  background-color: var(--bg-hover) !important;
+}
+
+/* УБИРАЕМ BORDER С БЛОКОВ В ТЕМНОЙ ТЕМЕ */
+.dark .student-main-surface,
+.dark .student-shell-main,
+.dark .rounded-\[28px\],
+.dark [class*="Card"],
+.dark [class*="card"],
+.dark [role="dialog"],
+.dark [role="menu"],
+.dark .border,
+.dark .border-neutral-200,
+.dark .border-neutral-300,
+.dark .border-neutral-100,
+.dark .border-white\/80 {
+  border-color: transparent !important;
+}
+
+/* СТИЛИЗАЦИЯ ИНПУТА ЧАТА (COMPOSER) */
+.composer-container {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+}
+
+.dark .composer-container {
+  background-color: #18181b !important;
+  border: 1px solid #27272a !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .composer-container textarea {
+  background-color: transparent !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+.dark .composer-container button {
+  border-color: transparent !important;
+  background-color: transparent !important;
+  color: var(--text-muted) !important;
+}
+
+.dark .composer-container button:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--text-main) !important;
+}
+
+.dark .composer-container button[aria-label="Send"][type="button"] {
+  background-color: #27272a !important;
+  color: #71717a !important;
+  cursor: default;
+}
+
+.dark .composer-container button[aria-label="Send"][type="submit"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.dark .composer-container button[aria-label="Send"][type="submit"]:hover {
+  background-color: #e4e4e7 !important;
+}

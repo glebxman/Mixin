@@ -1,0 +1,4 @@
+@import "tailwindcss";
+@import "@edtech/ui/styles.css";
+
+@source "../../../packages/ui/components";

@@ -1,0 +1,30 @@
+{
+  "name": "@edtech/integrations",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsup",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0",
+    "@fastify/cors": "^11.0.0",
+    "axios": "^1.7.0",
+    "ioredis": "^5.0.0",
+    "@prisma/client": "^6.0.0",
+    "node-cron": "^3.0.3",
+    "zod": "^3.24.0",
+    "@edtech/db": "workspace:*",
+    "@edtech/types": "workspace:*",
+    "@edtech/config": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.8.0",
+    "@types/node": "^22.0.0",
+    "@types/node-cron": "^3.0.0"
+  }
+}
