@@ -142,10 +142,8 @@ export async function questsRoutes(app: FastifyInstance) {
         );
       }
 
-      const student = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!student) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
 
       const subjectLabel = normalizeSubjectLabel(body.data.subject);
       const subjectSlug = slugFromLabel(subjectLabel);
@@ -295,10 +293,8 @@ export async function questsRoutes(app: FastifyInstance) {
         return reply.status(400).send({ success: false, error: "Invalid id" });
       }
 
-      const student = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!student) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
       const canUseQuests = await ensureQuestsEnabled(app, request.authUser!.userId, reply);
       if (!canUseQuests) return;
 
@@ -338,10 +334,8 @@ export async function questsRoutes(app: FastifyInstance) {
         return reply.status(400).send({ success: false, error: "Invalid score" });
       }
 
-      const student = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!student) {
-        return reply.status(404).send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
       const canUseQuests = await ensureQuestsEnabled(app, request.authUser!.userId, reply);
       if (!canUseQuests) return;
 

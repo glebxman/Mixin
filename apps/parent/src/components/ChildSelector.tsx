@@ -1,5 +1,6 @@
 import { Avatar, Card } from "@edtech/ui";
 import type { ParentChild } from "@edtech/api-client";
+import { useI18n } from "@edtech/i18n";
 
 export function ChildSelector({
   children: items,
@@ -10,11 +11,14 @@ export function ChildSelector({
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
+  const { t } = useI18n();
   if (items.length <= 1) return null;
 
   return (
     <Card className="p-4">
-      <p className="mb-3 text-sm font-medium text-neutral-700">Выберите ребёнка</p>
+      <p className="mb-3 text-sm font-medium text-neutral-700">
+        {t("parent.selectChild")}
+      </p>
       <div className="flex flex-wrap gap-2">
         {items.map((child) => {
           const fullName = `${child.firstName} ${child.lastName}`.trim();
@@ -33,7 +37,7 @@ export function ChildSelector({
               <div>
                 <p className="font-medium text-neutral-900">{fullName}</p>
                 <p className="text-xs text-neutral-500">
-                  {child.grade}, {child.schoolName ?? "Школа не указана"}
+                  {child.grade}, {child.schoolName ?? t("parent.schoolNotSet")}
                 </p>
               </div>
             </button>

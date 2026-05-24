@@ -2,7 +2,7 @@
  * Хелперы для cookie-сессии: единые TTL и setAuthCookies.
  * Используются и в auth.routes, и в auth.google.
  */
-import type { FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
   ACCESS_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
@@ -43,3 +43,42 @@ export const AUTH_RATE_LIMIT = {
     },
   },
 };
+
+/**
+ * Issues an access + refresh JWT for `user`, persists the refresh token as
+ * a Session row, and writes the auth cookies. Replaces a 20-line block
+ * that was duplicated five times across register / login / refresh /
+ * Google callback / Google complete.
+ *
+ * Returns the generated tokens for callers that need them (e.g. logging),
+ * but most callers can ignore the return value.
+ */
+export async function issueSession(
+  app: FastifyInstance,
+  request: FastifyRequest,
+  reply: FastifyReply,
+  user: { id: string; role: string },
+): Promise<{ accessToken: string; refreshToken: string }> {
+  const accessToken = app.jwt.sign(
+    { userId: user.id, role: user.role },
+    { expiresIn: ACCESS_TTL },
+  );
+  const refreshToken = app.jwt.sign(
+    { userId: user.id },
+    { expiresIn: REFRESH_TTL },
+  );
+
+  await app.prisma.session.create({
+    data: {
+      userId: user.id,
+      refreshToken,
+      ip: request.ip,
+      userAgent: request.headers["user-agent"] || null,
+      expiresAt: new Date(Date.now() + REFRESH_MAX_AGE_SECONDS * 1000),
+    },
+  });
+
+  setAuthCookies(reply, accessToken, refreshToken, user.role);
+
+  return { accessToken, refreshToken };
+}

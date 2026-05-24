@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { adminApi, type AdminUser } from "@edtech/api-client";
+import { adminApi, getPlanLabelKey, type AdminUser } from "@edtech/api-client";
 import type { Role, SubscriptionPlan } from "@edtech/types";
 import { useI18n } from "@edtech/i18n";
 import {
@@ -42,9 +42,7 @@ const ROLES: Role[] = ["STUDENT", "PARENT", "SUPER_ADMIN"];
 const PLANS: SubscriptionPlan[] = ["FREE", "BASIC", "PREMIUM"];
 
 function planLabel(plan: SubscriptionPlan, t: (key: string) => string) {
-  if (plan === "PREMIUM") return t("plans.quests");
-  if (plan === "BASIC") return t("plans.credits");
-  return t("plans.free");
+  return t(getPlanLabelKey(plan));
 }
 
 export function UsersPage() {

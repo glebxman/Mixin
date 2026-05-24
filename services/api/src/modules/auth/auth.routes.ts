@@ -17,6 +17,7 @@ import {
   AUTH_RATE_LIMIT,
   REFRESH_MAX_AGE_SECONDS,
   REFRESH_TTL,
+  issueSession,
   setAuthCookies,
 } from "./auth.cookies.js";
 import { googleAuthRoutes } from "./auth.google.js";
@@ -37,27 +38,7 @@ export async function authRoutes(app: FastifyInstance) {
 
     try {
       const user = await registerUser(app.prisma, data);
-      const accessToken = app.jwt.sign(
-        { userId: user.id, role: user.role },
-        { expiresIn: ACCESS_TTL },
-      );
-      const refreshToken = app.jwt.sign(
-        { userId: user.id },
-        { expiresIn: REFRESH_TTL },
-      );
-
-      await app.prisma.session.create({
-        data: {
-          userId: user.id,
-          refreshToken,
-          ip: request.ip,
-          userAgent: request.headers["user-agent"] || null,
-          expiresAt: new Date(Date.now() + REFRESH_MAX_AGE_SECONDS * 1000),
-        },
-      });
-
-      setAuthCookies(reply, accessToken, refreshToken, user.role);
-
+      await issueSession(app, request, reply, user);
       return reply.status(201).send({ success: true, data: { user } });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Registration failed";
@@ -80,27 +61,7 @@ export async function authRoutes(app: FastifyInstance) {
 
     try {
       const user = await loginUser(app.prisma, data);
-      const accessToken = app.jwt.sign(
-        { userId: user.id, role: user.role },
-        { expiresIn: ACCESS_TTL },
-      );
-      const refreshToken = app.jwt.sign(
-        { userId: user.id },
-        { expiresIn: REFRESH_TTL },
-      );
-
-      await app.prisma.session.create({
-        data: {
-          userId: user.id,
-          refreshToken,
-          ip: request.ip,
-          userAgent: request.headers["user-agent"] || null,
-          expiresAt: new Date(Date.now() + REFRESH_MAX_AGE_SECONDS * 1000),
-        },
-      });
-
-      setAuthCookies(reply, accessToken, refreshToken, user.role);
-
+      await issueSession(app, request, reply, user);
       return reply.status(200).send({ success: true, data: { user } });
     } catch (err) {
       app.log.warn(
@@ -117,9 +78,7 @@ export async function authRoutes(app: FastifyInstance) {
     const refreshToken = request.cookies[REFRESH_TOKEN_COOKIE];
     if (refreshToken) {
       try {
-        await app.prisma.session.delete({
-          where: { refreshToken },
-        });
+        await app.prisma.session.delete({ where: { refreshToken } });
       } catch {
         // Ignore if session not found in DB
       }
@@ -162,7 +121,11 @@ export async function authRoutes(app: FastifyInstance) {
         .send({ success: false, error: "Session expired or invalid" });
     }
 
-    // Token rotation:
+    // Refresh path keeps the manual rotation: it must atomically delete the
+    // old session and create the new one in a single transaction. Using
+    // issueSession() here would split that into two round-trips and create
+    // a (very small) window where two valid refresh tokens exist for the
+    // same user — undesired.
     const accessToken = app.jwt.sign(
       { userId: session.userId, role: session.user.role },
       { expiresIn: ACCESS_TTL },
@@ -174,9 +137,7 @@ export async function authRoutes(app: FastifyInstance) {
 
     try {
       await app.prisma.$transaction([
-        app.prisma.session.delete({
-          where: { id: session.id },
-        }),
+        app.prisma.session.delete({ where: { id: session.id } }),
         app.prisma.session.create({
           data: {
             userId: session.userId,

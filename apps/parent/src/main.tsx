@@ -133,7 +133,7 @@ function ParentShell({ children }: { children: React.ReactNode }) {
               className="inline-flex h-12 items-center gap-2 rounded-full bg-[#f2f2ec] px-5 text-sm font-medium text-[#555651] transition hover:bg-white hover:text-[#151614]"
             >
               <ArrowRightOnRectangleIcon className="size-4" />
-              <span className="hidden sm:inline">Выйти</span>
+              <span className="hidden sm:inline">{t("common.logout")}</span>
             </button>
           </div>
         </div>

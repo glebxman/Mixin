@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { findStudentByUserId } from "../students/students.service.js";
+import { requireStudent } from "../students/students.service.js";
 import { CREDIT_COSTS, SUBSCRIPTION_LIMITS } from "@edtech/config";
 import { consumeDailyCredits } from "../../utils/credits.js";
 import { incrementDailyCounter } from "../../utils/redis-rate-limit.js";
@@ -60,12 +60,8 @@ export async function aiImageRoutes(app: FastifyInstance) {
       }
 
       const userId = request.authUser!.userId;
-      const student = await findStudentByUserId(app.prisma, userId);
-      if (!student) {
-        return reply
-          .status(404)
-          .send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
 
       const user = await app.prisma.user.findUnique({
         where: { id: userId },

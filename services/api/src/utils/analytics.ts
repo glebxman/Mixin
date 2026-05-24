@@ -584,17 +584,40 @@ ${analytics.weaknesses.map((w: string) => `  * ${w}`).join("\n")}
 
       const data = await response.json();
       const content = data.choices?.[0]?.message?.content?.trim() || "";
-      const jsonStr = content.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
-      const parsed = JSON.parse(jsonStr);
+      
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(content);
+      } catch {
+        const cleanedStr = content.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+        try {
+          parsed = JSON.parse(cleanedStr);
+        } catch {
+          const startIdx = content.indexOf("{");
+          const endIdx = content.lastIndexOf("}");
+          if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+            try {
+              parsed = JSON.parse(content.substring(startIdx, endIdx + 1));
+            } catch (err) {
+              throw new Error(`Failed to parse extracted JSON block: ${(err as Error).message}`);
+            }
+          } else {
+            throw new Error("No valid JSON structure found in content");
+          }
+        }
+      }
 
-      if (parsed.aiAnalysisStudent && parsed.aiAnalysisParent) {
+      const studentAnalysis = parsed.aiAnalysisStudent || parsed.studentAnalysis || parsed.ai_analysis_student || parsed.student;
+      const parentAnalysis = parsed.aiAnalysisParent || parsed.parentAnalysis || parsed.ai_analysis_parent || parsed.parent;
+
+      if (studentAnalysis && parentAnalysis) {
         console.log(`[generateAiFeedback] Successfully generated AI feedback with ${currentModel}`);
         return {
-          aiAnalysisStudent: parsed.aiAnalysisStudent,
-          aiAnalysisParent: parsed.aiAnalysisParent,
+          aiAnalysisStudent: studentAnalysis,
+          aiAnalysisParent: parentAnalysis,
         };
       }
-      throw new Error(`Invalid JSON format returned by ${currentModel}`);
+      throw new Error(`Missing expected student or parent feedback keys in returned JSON from ${currentModel}`);
     } catch (error) {
       lastError = error;
       console.warn(`[generateAiFeedback] Model ${currentModel} failed:`, error);

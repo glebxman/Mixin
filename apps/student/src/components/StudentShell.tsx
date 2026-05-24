@@ -51,6 +51,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
         panelLabel={t("panels.student")}
         user={{ name: userName, sub: user?.email }}
         onLogout={handleLogout}
+        logoutLabel={t("common.logout")}
         LinkComponent={Link}
       />
       <div className="mx-auto mt-3 flex max-w-7xl gap-3">

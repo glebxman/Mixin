@@ -10,10 +10,7 @@ import { COOKIE_PREFIX } from "@edtech/config";
 import { completeGoogleRegistration, isRegistrationComplete } from "./auth.service.js";
 import {
   AUTH_RATE_LIMIT,
-  ACCESS_TTL,
-  REFRESH_TTL,
-  REFRESH_MAX_AGE_SECONDS,
-  setAuthCookies,
+  issueSession,
 } from "./auth.cookies.js";
 import { clearSessionCookie, safeCompareStrings, setSessionCookie } from "../../plugins/auth.js";
 
@@ -264,26 +261,7 @@ export async function googleAuthRoutes(app: FastifyInstance) {
       }
 
       const user = existingUser;
-      const accessToken = app.jwt.sign(
-        { userId: user.id, role: user.role },
-        { expiresIn: ACCESS_TTL },
-      );
-      const refreshToken = app.jwt.sign(
-        { userId: user.id },
-        { expiresIn: REFRESH_TTL },
-      );
-
-      await app.prisma.session.create({
-        data: {
-          userId: user.id,
-          refreshToken,
-          ip: request.ip,
-          userAgent: request.headers["user-agent"] || null,
-          expiresAt: new Date(Date.now() + REFRESH_MAX_AGE_SECONDS * 1000),
-        },
-      });
-
-      setAuthCookies(reply, accessToken, refreshToken, user.role);
+      await issueSession(app, request, reply, user);
       return reply.redirect(getRoleUrl(user.role, returnPath));
     } catch (err) {
       app.log.warn(
@@ -335,27 +313,8 @@ export async function googleAuthRoutes(app: FastifyInstance) {
         });
       }
 
-      const accessToken = app.jwt.sign(
-        { userId: user.id, role: user.role },
-        { expiresIn: ACCESS_TTL },
-      );
-      const refreshToken = app.jwt.sign(
-        { userId: user.id },
-        { expiresIn: REFRESH_TTL },
-      );
-
-      await app.prisma.session.create({
-        data: {
-          userId: user.id,
-          refreshToken,
-          ip: request.ip,
-          userAgent: request.headers["user-agent"] || null,
-          expiresAt: new Date(Date.now() + REFRESH_MAX_AGE_SECONDS * 1000),
-        },
-      });
-
+      await issueSession(app, request, reply, user);
       clearSessionCookie(reply, GOOGLE_SIGNUP_COOKIE);
-      setAuthCookies(reply, accessToken, refreshToken, user.role);
 
       return reply.status(201).send({ success: true, data: { user } });
     } catch (err) {

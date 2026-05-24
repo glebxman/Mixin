@@ -1,6 +1,6 @@
 import { Readable } from "node:stream";
 import type { FastifyInstance } from "fastify";
-import { findStudentByUserId } from "../students/students.service.js";
+import { requireStudent } from "../students/students.service.js";
 import {
   AIServiceResponse,
   STREAM_CHUNK_SIZE,
@@ -209,12 +209,8 @@ export async function aiRoutes(app: FastifyInstance) {
     "/sessions",
     { preHandler: [app.authenticate, app.requireRole("STUDENT")] },
     async (request, reply) => {
-      const student = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!student) {
-        return reply
-          .status(404)
-          .send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
 
       // Достаём только title (первое user-сообщение) через SQL,
       // не загружая весь messages JSON для всех 50 сессий.
@@ -263,12 +259,8 @@ export async function aiRoutes(app: FastifyInstance) {
         return reply.status(400).send({ success: false, error: "Invalid id" });
       }
 
-      const student = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!student) {
-        return reply
-          .status(404)
-          .send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
 
       const session = await app.prisma.aiSession.findUnique({
         where: { id: params.data.sessionId },
@@ -303,12 +295,8 @@ export async function aiRoutes(app: FastifyInstance) {
         return reply.status(400).send({ success: false, error: "Invalid id" });
       }
 
-      const student = await findStudentByUserId(app.prisma, request.authUser!.userId);
-      if (!student) {
-        return reply
-          .status(404)
-          .send({ success: false, error: "Student profile not found" });
-      }
+      const student = await requireStudent(app, request, reply);
+      if (!student) return;
 
       const deleted = await app.prisma.aiSession.deleteMany({
         where: { id: params.data.sessionId, studentId: student.id },

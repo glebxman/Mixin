@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { studentApi } from "@edtech/api-client";
+import { getPlanLabelKey, studentApi } from "@edtech/api-client";
 import {
   CalendarDaysIcon,
   QuestionMarkCircleIcon,
@@ -42,9 +42,7 @@ export function AccountPanel({
   const userId = providedUserId || "—";
 
   function planLabel(plan: string | undefined): string {
-    if (plan === "PREMIUM") return t("plans.quests");
-    if (plan === "BASIC") return t("plans.credits");
-    return t("plans.free");
+    return t(getPlanLabelKey(plan));
   }
 
   async function handleCopy() {

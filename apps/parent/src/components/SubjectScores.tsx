@@ -14,21 +14,23 @@ import {
   MinusSmallIcon,
 } from "@heroicons/react/24/outline";
 import type { SubjectScore } from "@edtech/api-client";
+import { useI18n } from "@edtech/i18n";
 
 export function SubjectScores({ items }: { items: SubjectScore[] }) {
+  const { t } = useI18n();
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BookOpenIcon className="size-5 text-emerald-500" />
-          Успеваемость по предметам
+          {t("analytics.subjectScoresTitle")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
           <EmptyState
-            title="Данные появятся после первых занятий"
-            description="Как только ребёнок начнёт заниматься, мы покажем оценки."
+            title={t("parent.subjectScoresEmptyTitle")}
+            description={t("parent.subjectScoresEmptyDesc")}
             icon={BookOpenIcon}
           />
         ) : (

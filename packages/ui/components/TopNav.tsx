@@ -16,6 +16,8 @@ interface TopNavProps {
   items?: NavItem[];
   user?: { name: string; sub?: string };
   onLogout?: () => void;
+  /** Localised label for the logout button (rendered next to the icon on sm+). */
+  logoutLabel?: string;
   /** Принимает любой роутерный Link, чтобы не зависеть от react-router. */
   LinkComponent?: React.ComponentType<{
     to: string;
@@ -45,6 +47,7 @@ export function TopNav({
   items = [],
   user,
   onLogout,
+  logoutLabel,
   LinkComponent = Anchor,
   className,
 }: TopNavProps) {
@@ -113,7 +116,9 @@ export function TopNav({
               className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors duration-150 hover:bg-neutral-950 hover:text-white"
             >
               <ArrowRightOnRectangleIcon className="size-4" />
-              <span className="hidden sm:inline">Выйти</span>
+              {logoutLabel ? (
+                <span className="hidden sm:inline">{logoutLabel}</span>
+              ) : null}
             </button>
           )}
         </div>

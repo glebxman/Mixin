@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   aiApi,
   authApi,
+  getPlanLabelKey,
   subscriptionApi,
   type ChatAttachment,
 } from "@edtech/api-client";
@@ -69,9 +70,7 @@ export function ChatPage({ userName, userEmail }: ChatPageProps) {
   const isEmpty = messages.length === 0;
 
   function planLabel(plan: string | undefined): string {
-    if (plan === "PREMIUM") return t("plans.quests");
-    if (plan === "BASIC") return t("plans.credits");
-    return t("plans.free");
+    return t(getPlanLabelKey(plan));
   }
 
   async function send() {

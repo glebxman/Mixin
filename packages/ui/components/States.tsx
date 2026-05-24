@@ -12,8 +12,17 @@ interface BaseProps {
   className?: string;
 }
 
+/**
+ * Stateful UI primitives.
+ *
+ * NOTE: this package is i18n-free by design — it must not pull React
+ * context. Callers in apps/* should pass localised `label`/`title`/`message`
+ * via props. When omitted we render a neutral fallback ("..." for loading,
+ * the system icon-only error card) instead of any hardcoded language string.
+ */
+
 export function LoadingState({
-  label = "Загрузка...",
+  label,
   className,
 }: BaseProps & { label?: string }) {
   return (
@@ -24,13 +33,13 @@ export function LoadingState({
       )}
     >
       <Spinner className="text-neutral-700" />
-      <span className="ml-3 text-sm">{label}</span>
+      {label ? <span className="ml-3 text-sm">{label}</span> : null}
     </div>
   );
 }
 
 export function ErrorState({
-  title = "Что-то пошло не так",
+  title,
   message,
   className,
   action,
@@ -47,7 +56,7 @@ export function ErrorState({
       )}
     >
       <ExclamationTriangleIcon className="size-7" />
-      <p className="font-semibold">{title}</p>
+      {title ? <p className="font-semibold">{title}</p> : null}
       {message && <p className="text-sm text-[#e92554]/80">{message}</p>}
       {action}
     </div>
@@ -86,8 +95,8 @@ export function EmptyState({
 }
 
 /**
- * SkeletonBlock — для placeholder loading состояний (списков, таблиц).
- * Подсвечивается shimmer-анимацией из styles.css.
+ * SkeletonBlock — placeholder loading state for lists/tables.
+ * Animated by the shimmer keyframes in styles.css.
  */
 export function SkeletonBlock({
   className,

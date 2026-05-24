@@ -68,4 +68,6 @@ export {
 
 export { adminApi, type AdminOverview, type AdminUser } from "./src/admin";
 
+export { getPlanLabelKey } from "./src/plans";
+
 export type * from "@edtech/types";

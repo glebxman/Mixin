@@ -37,7 +37,15 @@ export async function adminRoutes(app: FastifyInstance) {
       const [totalUsers, activeSchools, aiRequestsToday, paidPayments] =
         await Promise.all([
           app.prisma.user.count({ where: { deletedAt: null } }),
-          app.prisma.school.count(),
+          app.prisma.studentProfile.groupBy({
+            by: ["schoolName"],
+            where: {
+              schoolName: {
+                not: null,
+                notIn: [""],
+              },
+            },
+          }).then((res) => res.length),
           app.prisma.aiSession.count({ where: { createdAt: { gte: dayAgo } } }),
           app.prisma.payment.findMany({ where: { status: "PAID" } }),
         ]);

@@ -23,7 +23,7 @@ import {
 } from "@edtech/api-client";
 import { I18nProvider, useI18n } from "@edtech/i18n";
 import { LanguageSwitcher } from "@edtech/i18n/LanguageSwitcher";
-import { AppShell, AuthGuard, Brand, Spinner, type NavItem } from "@edtech/ui";
+import { AppShell, AuthGuard, Brand, Spinner, cn, type NavItem } from "@edtech/ui";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import "./index.css";
 
@@ -78,7 +78,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#f4f5f6] text-neutral-900 font-sans antialiased">
-      <div className="mx-auto max-w-7xl px-4 pt-4 md:pt-6">
+      <div className="mx-auto px-4 pt-4 md:pt-6">
         <header className="flex flex-col md:flex-row items-center justify-between gap-4 rounded-3xl bg-[#161719] px-6 py-3 shadow-[0_12px_30px_-4px_rgba(0,0,0,0.15)] border border-[#232529]">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
@@ -153,7 +153,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
       </div>
 
-      <main className="mx-auto max-w-7xl px-4 py-8">
+      <main className="mx-auto px-4 py-8">
         <div className="space-y-6">
           {children}
         </div>

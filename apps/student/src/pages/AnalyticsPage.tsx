@@ -376,8 +376,8 @@ function AiAnalysisCard({ feedback }: { feedback: string }) {
   const paragraphs = feedback.split("\n").filter((p) => p.trim().length > 0);
 
   return (
-    <Card className="relative overflow-hidden border-violet-150 dark:border-violet-900 bg-gradient-to-br from-violet-50/50 via-white to-indigo-50/30 dark:from-violet-950/40 dark:via-neutral-900 dark:to-indigo-950/30 shadow-sm">
-      <div className="absolute right-0 top-0 -mr-6 -mt-6 size-24 rounded-full bg-violet-200/30 dark:bg-violet-850/10 blur-2xl" />
+    <Card className="relative overflow-hidden border-violet-150 dark:border-violet-900/40 bg-gradient-to-br from-violet-50/50 via-white to-indigo-50/30 dark:from-violet-950/30 dark:via-neutral-900 dark:to-indigo-950/20 bg-transparent dark:bg-transparent shadow-sm">
+      <div className="absolute right-0 top-0 -mr-6 -mt-6 size-24 rounded-full bg-violet-200/20 dark:bg-violet-800/10 blur-2xl" />
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-xl font-bold text-neutral-950 dark:text-neutral-50">
           <SparklesIcon className="size-6 text-violet-600 dark:text-violet-400 animate-pulse" />

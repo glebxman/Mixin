@@ -28,11 +28,16 @@ AI_IMAGE_GENERATION_ENABLED = os.getenv("AI_IMAGE_GENERATION_ENABLED", "true").l
 AI_IMAGE_MAX_DATA_URL_LEN = int(os.getenv("AI_IMAGE_MAX_DATA_URL_LEN", "2500000"))
 VISUALIZATION_MARKER_RE = re.compile(r"<!--\s*VISUALIZE_IMAGE\s*-->", re.IGNORECASE)
 
-PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-4-maverick")
+PRIMARY_MODEL = os.getenv("OPENROUTER_MODEL", "qwen/qwen3-next-80b-a3b-instruct:free")
+# Multilingual free models on OpenRouter, validated via /v1/models.
+# Diverse providers so a 429/empty/payment-required on one rarely cascades.
 FALLBACK_MODELS = [
     "minimax/minimax-m2.5:free",
     "meta-llama/llama-3.3-70b-instruct:free",
-    "deepseek/deepseek-v4-flash:free"
+    "qwen/qwen3-next-80b-a3b-instruct:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "z-ai/glm-4.5-air:free",
+    "openai/gpt-oss-120b:free",
 ]
 
 MAX_RETRIES = 1
