@@ -120,11 +120,19 @@ API_PORT=3001
 AI_SERVICE_URL=http://localhost:8000
 
 # ─── Public URLs (используются при сборке фронтов) ───────────
+# Вариант А: С поддоменами (по умолчанию)
 VITE_API_URL=https://api.mixin.uz
 VITE_STUDENT_URL=https://mixin.uz
 VITE_PARENT_URL=https://parent.mixin.uz
-VITE_SCHOOL_URL=https://school.mixin.uz
 VITE_ADMIN_URL=https://admin.mixin.uz
+
+# Вариант Б: БЕЗ поддоменов (на один домен или IP)
+# VITE_API_URL=https://mixin.uz/api
+# VITE_STUDENT_URL=https://mixin.uz
+# VITE_PARENT_URL=https://mixin.uz/parent
+# VITE_ADMIN_URL=https://mixin.uz/admin
+# VITE_BASE_PATH_PARENT=/parent/
+# VITE_BASE_PATH_ADMIN=/admin/
 ```
 
 ---
@@ -283,14 +291,16 @@ docker compose -f docker-compose.prod.yml ps
 
 ## Шаг 9 — Настройка Nginx
 
-### 9.1 Создай конфиги для каждого поддомена
+### 9.1 Выберите один из двух вариантов настройки
 
+#### Вариант А: С поддоменами (mixin.uz, parent.mixin.uz, admin.mixin.uz, api.mixin.uz)
+
+Создайте файл `/etc/nginx/sites-available/mixin`:
 ```bash
 sudo nano /etc/nginx/sites-available/mixin
 ```
 
-Вставь:
-
+Вставьте следующую конфигурацию:
 ```nginx
 # ─── mixin.uz — Student SPA ──────────────────────────────────
 server {
@@ -313,20 +323,6 @@ server {
 
     location / {
         proxy_pass http://127.0.0.1:3200;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-
-# ─── school.mixin.uz — School SPA ────────────────────────────
-server {
-    listen 80;
-    server_name school.mixin.uz;
-
-    location / {
-        proxy_pass http://127.0.0.1:3300;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -375,6 +371,91 @@ server {
     }
 }
 ```
+
+---
+
+#### Вариант Б: БЕЗ поддоменов (Все приложения на одном домене или IP)
+
+При этом варианте все панели и API доступны по путям:
+- `https://mixin.uz` — Панель ученика (Student SPA)
+- `https://mixin.uz/parent/` — Панель родителя (Parent SPA)
+- `https://mixin.uz/admin/` — Панель администратора (Admin SPA)
+- `https://mixin.uz/api/` — API бэкенда (Fastify)
+
+> **Важно:** Убедитесь, что перед сборкой фронтов в файле `.env` настроены переменные из **Варианта Б** (см. Шаг 3).
+
+Создайте файл `/etc/nginx/sites-available/mixin`:
+```bash
+sudo nano /etc/nginx/sites-available/mixin
+```
+
+Вставьте следующую конфигурацию:
+```nginx
+server {
+    listen 80;
+    server_name mixin.uz www.mixin.uz; # Либо IP-адрес сервера (например, 195.195.195.195)
+
+    # Лимит размера тела (для загрузки изображений)
+    client_max_body_size 20M;
+
+    # Увеличенный таймаут для AI-запросов (могут идти 30–60 сек)
+    proxy_read_timeout 120s;
+    proxy_connect_timeout 10s;
+    proxy_send_timeout 120s;
+
+    # 1. Fastify API
+    location /api/ {
+        proxy_pass http://127.0.0.1:3001/; # Обратите внимание на слеш в конце!
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket поддержка
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    # 2. Redirect /parent -> /parent/
+    location /parent {
+        return 301 $scheme://$http_host$request_uri/;
+    }
+
+    # 3. Parent SPA
+    location /parent/ {
+        proxy_pass http://127.0.0.1:3200/; # Обратите внимание на слеш в конце!
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 4. Redirect /admin -> /admin/
+    location /admin {
+        return 301 $scheme://$http_host$request_uri/;
+    }
+
+    # 5. Admin SPA
+    location /admin/ {
+        proxy_pass http://127.0.0.1:3400/; # Обратите внимание на слеш в конце!
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 6. Student SPA (на корне)
+    location / {
+        proxy_pass http://127.0.0.1:3100;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
 
 ### 9.2 Активируй конфиг
 

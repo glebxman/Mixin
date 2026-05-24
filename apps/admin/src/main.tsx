@@ -172,7 +172,7 @@ function RouteFallback() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.VITE_BASE_PATH_ADMIN || "/"}>
       <AuthGuard
         source={{ useUser: useAuthMe }}
         expectedRole="SUPER_ADMIN"

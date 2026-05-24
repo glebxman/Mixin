@@ -191,7 +191,7 @@ function RouteFallback() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.VITE_BASE_PATH_PARENT || "/"}>
       <AuthGuard
         source={{ useUser: useAuthMe }}
         expectedRole="PARENT"

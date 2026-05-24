@@ -6,6 +6,7 @@ import { defineConfig, loadEnv } from "vite";
 export default defineConfig(({ mode }) => {
   const rootEnv = loadEnv(mode, path.resolve(__dirname, "../.."), "VITE_");
   return {
+    base: rootEnv.VITE_BASE_PATH_ADMIN || "/",
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
