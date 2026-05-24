@@ -69,7 +69,7 @@ function interpolate(template: string, vars?: Record<string, string | number>): 
 type I18nContextValue = {
   lang: Lang;
   setLang: (next: Lang) => void;
-  t: (key: string, vars?: Record<string, string | number>) => string;
+  t: (key: string, varsOrFallback?: Record<string, string | number> | string, fallback?: string) => string;
 };
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -89,10 +89,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: string, vars?: Record<string, string | number>): string => {
+    (key: string, varsOrFallback?: Record<string, string | number> | string, fallback?: string): string => {
+      const vars = typeof varsOrFallback === "object" ? varsOrFallback : undefined;
+      const fb = typeof varsOrFallback === "string" ? varsOrFallback : fallback;
       const dict = TRANSLATIONS[lang] ?? TRANSLATIONS[DEFAULT_LANG];
-      const fallback = TRANSLATIONS[DEFAULT_LANG];
-      const value = lookup(dict, key) ?? lookup(fallback, key) ?? key;
+      const fallbackDict = TRANSLATIONS[DEFAULT_LANG];
+      const value = lookup(dict, key) ?? lookup(fallbackDict, key) ?? fb ?? key;
       return interpolate(value, vars);
     },
     [lang],

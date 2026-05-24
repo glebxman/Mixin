@@ -134,7 +134,7 @@ export function ChildOverview({ overview }: { overview: ParentChildOverview }) {
               }
               subjects={subjects.slice(index * 2, index * 2 + 2)}
               recommendations={recs.slice(index, index + 2)}
-              accent={index === 0 ? "#f2ff19" : "#efff24"}
+              accent={index === 0 ? "#10b981" : "#34d399"}
             />
           ))}
         </div>
@@ -208,7 +208,7 @@ function TimelineColumn({
   return (
     <div className="relative min-h-[360px] rounded-[28px] border border-[#d4d4ca] bg-[#ecece2]/75 p-5">
       <div
-        className="absolute -top-4 left-10 grid size-8 place-items-center rounded-full text-[#2e3129] shadow-[0_0_20px_rgba(242,255,25,0.75)]"
+        className="absolute -top-4 left-10 grid size-8 place-items-center rounded-full text-white shadow-[0_0_20px_rgba(16,185,129,0.6)]"
         style={{ backgroundColor: accent }}
       >
         <CalendarDaysIcon className="size-4" />
@@ -232,6 +232,15 @@ function TimelineColumn({
 function SubjectPanel({ item }: { item: SubjectScore }) {
   const { t } = useI18n();
   const score = Math.round(item.score);
+
+  // Color the bar based on score
+  const barColor =
+    score >= 80
+      ? "bg-emerald-500"
+      : score >= 60
+        ? "bg-amber-400"
+        : "bg-rose-500";
+
   return (
     <article className="rounded-[22px] bg-white p-4 shadow-[0_18px_35px_rgba(37,38,34,0.06)]">
       <div className="mb-3 flex items-center justify-between">
@@ -240,13 +249,20 @@ function SubjectPanel({ item }: { item: SubjectScore }) {
           <BeakerIcon className="size-4" />
         </span>
       </div>
-      <div className="relative h-14 overflow-hidden rounded-2xl bg-[#ededdf]">
-        <div className="absolute inset-x-3 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#f2ff19]" />
-        <div className="absolute bottom-3 left-3 text-[11px] text-[#77786f]">
-          {t("parent.child.average")}
+      <div className="rounded-2xl bg-[#f3f3ed] p-3">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <span className="text-[11px] font-medium text-[#77786f]">
+            {t("parent.child.average")}
+          </span>
+          <span className="text-sm font-semibold text-[#1c1d1a]">
+            {score}%
+          </span>
         </div>
-        <div className="absolute bottom-3 right-3 text-sm font-semibold text-[#1c1d1a]">
-          {score}%
+        <div className="h-1.5 overflow-hidden rounded-full bg-[#dcdccd]">
+          <div
+            className={`h-full rounded-full ${barColor} transition-all duration-500`}
+            style={{ width: `${Math.max(0, Math.min(100, score))}%` }}
+          />
         </div>
       </div>
     </article>
@@ -256,15 +272,15 @@ function SubjectPanel({ item }: { item: SubjectScore }) {
 function RecommendationPill({ item }: { item: Recommendation }) {
   const tone =
     item.priority === "high"
-      ? "bg-[#ffe9e1] text-[#f15d2a]"
+      ? "bg-rose-100 text-rose-600"
       : item.priority === "medium"
-        ? "bg-[#fff5d8] text-[#8a6b00]"
-        : "bg-[#e8f8ef] text-[#089567]";
+        ? "bg-amber-100 text-amber-600"
+        : "bg-emerald-100 text-emerald-600";
 
   return (
     <div className="flex items-start gap-3 rounded-[22px] bg-white p-4 shadow-[0_18px_35px_rgba(37,38,34,0.05)]">
       <span className={`mt-0.5 grid size-8 shrink-0 place-items-center rounded-full ${tone}`}>
-        <LightBulbIcon className="size-4" />
+        <LightBulbIcon className="size-4 stroke-[2]" />
       </span>
       <div>
         <p className="text-sm font-semibold text-[#1c1d1a]">{item.title}</p>

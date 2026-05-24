@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { onboardingSchema } from "@edtech/types";
 import { ZodError } from "zod";
-import { buildStudentAnalytics } from "../../utils/analytics.js";
+import { buildStudentAnalytics, generateAiFeedback } from "../../utils/analytics.js";
 import { findStudentByUserId, getOrCreateStudentProfile } from "./students.service.js";
 
 export async function studentsRoutes(app: FastifyInstance) {
@@ -105,7 +105,32 @@ export async function studentsRoutes(app: FastifyInstance) {
         totalQuests,
       });
 
-      return { success: true, data: analytics };
+      // AI feedback with Redis cache (2h TTL)
+      const cacheKey = `ai-feedback:student:${profile.id}`;
+      let aiFeedback: { aiAnalysisStudent: string; aiAnalysisParent: string } | null = null;
+
+      const aiFeedbackRaw = await app.redis.get(cacheKey);
+      if (aiFeedbackRaw) {
+        try {
+          aiFeedback = JSON.parse(aiFeedbackRaw);
+        } catch {
+          aiFeedback = null;
+        }
+      }
+
+      if (!aiFeedback) {
+        aiFeedback = await generateAiFeedback(analytics);
+        await app.redis.set(cacheKey, JSON.stringify(aiFeedback), "EX", 7200);
+      }
+
+      return {
+        success: true,
+        data: {
+          ...analytics,
+          aiAnalysisStudent: aiFeedback.aiAnalysisStudent,
+          aiAnalysisParent: aiFeedback.aiAnalysisParent,
+        },
+      };
     },
   );
 

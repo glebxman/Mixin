@@ -72,6 +72,13 @@ export type AiModuleStatus = {
   description: string;
 };
 
+export type UniversityChance = {
+  name: string;
+  chance: "high" | "medium" | "low";
+  score: number;
+  note: string;
+};
+
 export type StudentAnalytics = {
   overallProgress: number;
   level: number;
@@ -100,6 +107,7 @@ export type StudentAnalytics = {
   questStrategy: QuestStrategy;
   integrations: IntegrationStatus[];
   aiModules: AiModuleStatus[];
+  universityChances: UniversityChance[];
   aiAnalysisStudent?: string | null;
   aiAnalysisParent?: string | null;
 };

@@ -52,6 +52,13 @@ export type AiModuleStatus = {
   description: string;
 };
 
+export type UniversityChance = {
+  name: string;
+  chance: "high" | "medium" | "low";
+  score: number; // 0-100
+  note: string;
+};
+
 export type StudentAnalytics = {
   overallProgress: number;
   level: number;
@@ -80,6 +87,7 @@ export type StudentAnalytics = {
   questStrategy: QuestStrategy;
   integrations: IntegrationStatus[];
   aiModules: AiModuleStatus[];
+  universityChances: UniversityChance[];
   aiAnalysisStudent?: string | null;
   aiAnalysisParent?: string | null;
 };
@@ -90,25 +98,80 @@ const DIRECTION_MAP = {
   it: {
     title: "IT и инженерия",
     subjects: ["Математика", "Информатика", "Физика", "Английский"],
-    universities: ["TUIT", "INHA University in Tashkent", "New Uzbekistan University"],
+    universities: [
+      "TUIT (Tashkent University of IT)",
+      "INHA University in Tashkent",
+      "New Uzbekistan University",
+      "Westminster International University (WIUT)",
+      "Amity University Tashkent",
+      "Turin Polytechnic University in Tashkent",
+    ],
     quests: ["мини-проект", "алгоритмы", "логика"],
   },
   medicine: {
     title: "Медицина и биология",
     subjects: ["Биология", "Химия", "Математика", "Логика"],
-    universities: ["Tashkent Medical Academy", "Tashkent Pediatric Medical Institute"],
+    universities: [
+      "Tashkent Medical Academy",
+      "Tashkent Pediatric Medical Institute",
+      "Samarkand State Medical University",
+      "Bukhara State Medical Institute",
+      "Tashkent Pharmaceutical Institute",
+    ],
     quests: ["кейс пациента", "биология", "логика"],
   },
   economy: {
     title: "Экономика и бизнес",
     subjects: ["Математика", "Английский", "История", "Финансовая грамотность"],
-    universities: ["University of World Economy and Diplomacy", "Tashkent State University of Economics"],
+    universities: [
+      "University of World Economy and Diplomacy (UWED)",
+      "Tashkent State University of Economics (TSUE)",
+      "Westminster International University (WIUT)",
+      "Management Development Institute of Singapore (MDIS) Tashkent",
+      "Tashkent Institute of Finance",
+    ],
     quests: ["бизнес-кейс", "финансы", "аналитика"],
+  },
+  law: {
+    title: "Юриспруденция",
+    subjects: ["История", "Родной язык", "Английский", "Обществознание"],
+    universities: [
+      "Tashkent State University of Law (TSUL)",
+      "University of World Economy and Diplomacy (UWED)",
+      "National University of Uzbekistan (NUUz)",
+    ],
+    quests: ["правовой кейс", "дебаты", "аналитика"],
+  },
+  education: {
+    title: "Педагогика и языки",
+    subjects: ["Родной язык", "Английский", "Литература", "Психология"],
+    universities: [
+      "Uzbekistan State World Languages University",
+      "Nizami Tashkent State Pedagogical University",
+      "Chirchik State Pedagogical University",
+    ],
+    quests: ["мини-урок", "презентация", "эссе"],
+  },
+  engineering: {
+    title: "Инженерия и архитектура",
+    subjects: ["Математика", "Физика", "Черчение", "Информатика"],
+    universities: [
+      "Turin Polytechnic University in Tashkent",
+      "Tashkent State Technical University",
+      "Tashkent Institute of Architecture and Civil Engineering",
+      "Navoi State Mining and Technology University",
+    ],
+    quests: ["проектирование", "физика", "3D-модель"],
   },
   general: {
     title: "Исследование направлений",
     subjects: ["Математика", "Родной язык", "Английский", "Логика"],
-    universities: ["National University of Uzbekistan", "New Uzbekistan University"],
+    universities: [
+      "National University of Uzbekistan (NUUz)",
+      "New Uzbekistan University",
+      "Tashkent State University of Economics (TSUE)",
+      "TUIT (Tashkent University of IT)",
+    ],
     quests: ["логика", "мини-проект", "самопрезентация"],
   },
 } as const;
@@ -192,6 +255,7 @@ export function buildStudentAnalytics(input: {
     questStrategy: buildQuestStrategy(studentProfile, weakSubjects, direction),
     integrations: buildIntegrations(),
     aiModules: buildAiModules(),
+    universityChances: buildUniversityChances(subjectScores, direction, studentProfile),
   };
 }
 
@@ -420,6 +484,71 @@ function buildAiModules(): AiModuleStatus[] {
   ];
 }
 
+function buildUniversityChances(
+  subjectScores: SubjectScore[],
+  direction: (typeof DIRECTION_MAP)[keyof typeof DIRECTION_MAP],
+  profile: { interests: string[]; favoriteSubjects: string[] },
+): UniversityChance[] {
+  const required = direction.subjects;
+  const relevantScores = subjectScores.filter((s) =>
+    required.some((r) => sameSubject(r, s.subject)),
+  );
+  const avgScore =
+    relevantScores.length > 0
+      ? relevantScores.reduce((sum, item) => sum + item.score, 0) / relevantScores.length
+      : 60;
+  const interestBonus = profile.interests.length + profile.favoriteSubjects.length > 2 ? 5 : 0;
+
+  // Each university has a difficulty tier (higher = harder to get in)
+  const difficultyTiers: Record<string, number> = {
+    "Westminster International University (WIUT)": 88,
+    "INHA University in Tashkent": 85,
+    "Turin Polytechnic University in Tashkent": 82,
+    "Amity University Tashkent": 75,
+    "University of World Economy and Diplomacy (UWED)": 84,
+    "Management Development Institute of Singapore (MDIS) Tashkent": 78,
+    "Tashkent Medical Academy": 86,
+    "Tashkent State University of Law (TSUL)": 82,
+    "National University of Uzbekistan (NUUz)": 76,
+    "New Uzbekistan University": 74,
+    "TUIT (Tashkent University of IT)": 72,
+    "Tashkent State University of Economics (TSUE)": 73,
+    "Tashkent State Technical University": 70,
+    "Nizami Tashkent State Pedagogical University": 65,
+    "Uzbekistan State World Languages University": 68,
+    "Tashkent Pediatric Medical Institute": 80,
+    "Samarkand State Medical University": 78,
+    "Bukhara State Medical Institute": 75,
+    "Tashkent Pharmaceutical Institute": 74,
+    "Tashkent Institute of Finance": 72,
+    "Tashkent Institute of Architecture and Civil Engineering": 70,
+    "Navoi State Mining and Technology University": 65,
+    "Chirchik State Pedagogical University": 62,
+  };
+
+  return direction.universities.map((uni) => {
+    const threshold = difficultyTiers[uni] ?? 70;
+    const studentScore = Math.min(100, Math.round(avgScore + interestBonus));
+    const gap = studentScore - threshold;
+
+    let chance: "high" | "medium" | "low";
+    let note: string;
+
+    if (gap >= 8) {
+      chance = "high";
+      note = `Текущая успеваемость (${studentScore}%) выше проходного уровня. Продолжай в том же темпе.`;
+    } else if (gap >= -5) {
+      chance = "medium";
+      note = `Шансы хорошие, но нужно подтянуть ${required.slice(0, 2).join(" и ")} на 5–10%.`;
+    } else {
+      chance = "low";
+      note = `Нужно серьёзно подтянуть ${required.slice(0, 2).join(" и ")}. Сейчас ${studentScore}%, нужно ~${threshold}%.`;
+    }
+
+    return { name: uni, chance, score: studentScore, note };
+  });
+}
+
 function resolveDirection(profile: {
   careerDirection?: string | null;
   targetProfession?: string | null;
@@ -436,9 +565,12 @@ function resolveDirection(profile: {
     .join(" ")
     .toLowerCase();
 
-  if (/(it|айти|програм|информ|код|software|computer)/i.test(text)) return DIRECTION_MAP.it;
-  if (/(мед|врач|биолог|хим|medicine|doctor)/i.test(text)) return DIRECTION_MAP.medicine;
-  if (/(эконом|business|бизнес|финанс|маркет|менедж)/i.test(text)) return DIRECTION_MAP.economy;
+  if (/(it|айти|програм|информ|код|software|computer|dastur)/i.test(text)) return DIRECTION_MAP.it;
+  if (/(мед|врач|биолог|хим|medicine|doctor|tibbiyot|farmac)/i.test(text)) return DIRECTION_MAP.medicine;
+  if (/(эконом|business|бизнес|финанс|маркет|менедж|iqtisod)/i.test(text)) return DIRECTION_MAP.economy;
+  if (/(юрис|право|law|huquq|адвокат)/i.test(text)) return DIRECTION_MAP.law;
+  if (/(педагог|учитель|язык|лингв|teacher|education|til)/i.test(text)) return DIRECTION_MAP.education;
+  if (/(инженер|архитект|строит|engineer|muhandis|техн)/i.test(text)) return DIRECTION_MAP.engineering;
   return DIRECTION_MAP.general;
 }
 
@@ -522,6 +654,7 @@ export async function generateAiFeedback(analytics: any): Promise<{
 - Любимые предметы: ${analytics.profileSummary.favoriteSubjects.join(", ") || "не указаны"}
 - Желаемая профессия: ${analytics.profileSummary.targetProfession || "не указана"}
 - Направление карьеры: ${analytics.profileSummary.careerDirection || "не указано"}
+- Ориентировочные вузы для этого направления: ${analytics.careerInsight.universities.join(", ") || "TUIT, INHA, WIUT, New Uzbekistan University, National University of Uzbekistan, Tashkent Medical Academy"}
 - Успеваемость по предметам (в %):
 ${analytics.subjectScores.map((s: any) => `  * ${s.subject}: ${s.score}% (тренд: ${s.trend})`).join("\n")}
 - Сильные стороны:
@@ -539,6 +672,7 @@ ${analytics.weaknesses.map((w: string) => `  * ${w}`).join("\n")}
 Требования к тексту для ученика (aiAnalysisStudent):
 - Обращайтесь на "ты", дружелюбно, мотивирующе, вдохновляюще.
 - Оцените его сильные стороны и объясните, как они помогут ему в достижении его цели (${analytics.profileSummary.targetProfession || "выбранного направления"}).
+- Дайте конкретную и понятную оценку шансов на поступление в целевые вузы (в какие университеты из списка шансов поступить больше всего при текущих оценках, а в какие пройти сложнее).
 - Дайте конкретные, практичные советы (какие темы подтянуть, какие квесты пройти) без общих фраз.
 - Держите объем около 150-250 слов, отформатируйте переносами строк для красивого чтения.
 
@@ -547,6 +681,7 @@ ${analytics.weaknesses.map((w: string) => `  * ${w}`).join("\n")}
 - Дайте объективную картину: в чем ребенок молодец, а где ему нужна поддержка и контроль.
 - Дайте конкретные рекомендации родителю, как поддержать ребенка дома (например, хвалить за успехи в математике, помочь организовать время для информатики).
 - Объясните простым языком, подходит ли выбранное ребенком карьерное направление (${analytics.profileSummary.targetProfession || "его интересам"}) текущей успеваемости.
+- Оцените шансы поступления ребенка в вузы на основе его текущих оценок (в какие вузы шансы выше, а куда поступить будет сложно без дополнительного контроля и усилий).
 - Держите объем около 150-250 слов, отформатируйте переносами строк для красивого чтения.
 
 Верните ТОЛЬКО валидный JSON без какого-либо разметки markdown (без \`\`\`json).

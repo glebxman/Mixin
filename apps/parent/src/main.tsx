@@ -23,13 +23,14 @@ import {
 } from "@edtech/api-client";
 import { I18nProvider, useI18n } from "@edtech/i18n";
 import { LanguageSwitcher } from "@edtech/i18n/LanguageSwitcher";
-import { AuthGuard, Brand, ScrollArea, Spinner } from "@edtech/ui";
+import { AuthGuard, ScrollArea, Spinner } from "@edtech/ui";
 import {
   ArrowRightOnRectangleIcon,
   HomeIcon,
   LightBulbIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
+import logoBlack from "./assets/logo_black.svg";
 import "./index.css";
 
 const DashboardPage = lazy(() =>
@@ -103,7 +104,10 @@ function ParentShell({ children }: { children: React.ReactNode }) {
             to="/"
             className="inline-flex h-14 items-center gap-3 rounded-[26px] bg-[#eeeee5] px-5 text-[#151614] transition hover:bg-white"
           >
-            <Brand variant="emerald" label="Mixin Parent" />
+            <img src={logoBlack} alt="Mixin" className="size-6" />
+            <span className="font-serif text-xl font-semibold leading-none tracking-tight">
+              mixin <span className="text-sm text-[#089567]">parent</span>
+            </span>
           </Link>
 
           <div className="ml-auto flex flex-wrap items-center justify-end gap-2">

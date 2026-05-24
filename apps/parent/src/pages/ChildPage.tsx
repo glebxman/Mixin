@@ -263,7 +263,7 @@ function SubjectPanel({ subjects }: { subjects: Array<{ subject: string; score: 
             {t("parent.child.subjectsPeriodSubtitle")}
           </p>
         </div>
-        <span className="grid size-10 place-items-center rounded-full bg-[#f2ff19] text-[#2e3129] shadow-[0_0_20px_rgba(242,255,25,0.75)]">
+        <span className="grid size-10 place-items-center rounded-full bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]">
           <CalendarDaysIcon className="size-5" />
         </span>
       </div>
@@ -291,7 +291,7 @@ function SubjectPanel({ subjects }: { subjects: Array<{ subject: string; score: 
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-[#d8d8cd]">
                 <div
-                  className="h-full rounded-full bg-[#eaff00]"
+                  className="h-full rounded-full bg-emerald-500"
                   style={{ width: `${Math.max(0, Math.min(100, Math.round(subject.score)))}%` }}
                 />
               </div>
@@ -380,7 +380,7 @@ function ParentAiAnalysisCard({ feedback }: { feedback: string }) {
   return (
     <div className="mb-6 rounded-[28px] border border-[#d9d9d1] bg-gradient-to-br from-[#f8f8f2] via-white to-[#ecece2] p-6 shadow-[0_18px_35px_rgba(37,38,34,0.05)]">
       <div className="flex items-center gap-2.5 mb-3">
-        <span className="grid size-9 place-items-center rounded-full bg-[#f2ff19] text-[#2e3129] shadow-[0_0_15px_rgba(242,255,25,0.5)]">
+        <span className="grid size-9 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]">
           <SparklesIcon className="size-5 animate-pulse" />
         </span>
         <div>

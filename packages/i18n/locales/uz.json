@@ -27,7 +27,13 @@
     "yearsOld": "{age} yosh",
     "noData": "Maʼlumot yoʻq",
     "studentFallback": "Oʻquvchi",
-    "loadFailed": "Yuklab boʻlmadi"
+    "loadFailed": "Yuklab boʻlmadi",
+    "reset": "Qayta boshlash",
+    "hint": "Maslahat",
+    "showHint": "Maslahat",
+    "hideHint": "Maslahatni yashirish",
+    "check": "Javobni tekshirish",
+    "solved": "Yechildi!"
   },
   "languages": {
     "ru": "Русский",
@@ -191,7 +197,14 @@
     "levelCardTitle": "Daraja {level}",
     "levelCardNext": "keyingi darajagacha {xp} XP",
     "aiAnalysisTitle": "Shaxsiy AI-tahlil",
-    "aiAnalysisDescription": "Sizning AI-murabbiyingizdan oʻzlashtirish, karyera istiqbollari va shaxsiy tavsiyalarning batafsil tahlili."
+    "aiAnalysisDescription": "Sizning AI-murabbiyingizdan oʻzlashtirish, karyera istiqbollari va shaxsiy tavsiyalarning batafsil tahlili.",
+    "universityChancesTitle": "Universitetga kirish imkoniyatlari",
+    "universityChancesDesc": "Joriy baholar va tanlangan yoʻnalish asosida imkoniyatlar bahosi.",
+    "chance": {
+      "high": "Yuqori imkoniyat",
+      "medium": "Oʻrtacha",
+      "low": "Past imkoniyat"
+    }
   },
   "quests": {
     "title": "Kvestlar",
@@ -209,7 +222,16 @@
       "FAILED": "Bajarilmagan"
     },
     "xpReward": "{xp} XP",
-    "estimatedTime": "{minutes} daq"
+    "estimatedTime": "{minutes} daq",
+    "matchstick": {
+      "title": "Gugurt boshqotirmasi",
+      "dontRemoveHorizontal": "Belgi asosiy gorizontal chizigʻini olib boʻlmaydi.",
+      "placeInHand": "Avval gugurtni maydonga qaytaring.",
+      "invalidDigits": "Baʼzi raqamlar notoʻgʻri tuzilgan.",
+      "incorrectEquation": "Tenglik notoʻgʻri: {eq}",
+      "inHand": "Gugurt qoʻlda. Boʻsh joyni tanlang.",
+      "howTo": "Gugurtni olish uchun bosing yoki boʻsh joyga qoʻyish uchun bosing."
+    }
   },
   "profile": {
     "title": "Profil",
@@ -649,5 +671,38 @@
     "free": "Free tarif",
     "credits": "Credits tarif",
     "quests": "Quests tarif"
+  },
+  "quests": {
+    "matchstick": {
+      "title": "Gugurt donalari bilan boshqotirma",
+      "shortTitle": "Gugurt donalari bilan mantiqiy boshqotirma",
+      "defaultTask": "Tenglik toʻgʻri boʻlishi uchun bitta gugurt donasini koʻchiring.",
+      "inHand": "Gugurt donasi qoʻlingizda. Uni qoʻyish uchun boʻsh joyni tanlang.",
+      "howTo": "Olish uchun gugurt donasini, qoʻyish uchun esa boʻsh joyni bosing.",
+      "dontRemoveHorizontal": "Belgining asosiy gorizontal chizigʻini olib tashlash mumkin emas.",
+      "placeInHand": "Avval gugurt donasini maydonga qaytaring.",
+      "invalidDigits": "Baʼzi raqamlar notoʻgʻri tuzilgan.",
+      "incorrectEquation": "Tenglik notoʻgʻri: {eq}"
+    },
+    "scratch": {
+      "title": "Scratch-kvest: Algoritmlar",
+      "shortTitle": "Scratch algoritmik kvesti",
+      "defaultTask": "Robotga marraga yetib borishiga yordam bering.",
+      "palette": "Mavjud bloklar",
+      "workspace": "Harakatlar algoritmi",
+      "emptyHint": "Dasturni yigʻish uchun yuqoridagi bloklarni bosing.",
+      "emptyWorkspace": "Ish maydoniga harakat bloklarini qoʻshing.",
+      "didNotReach": "Robot toʻxtadi, lekin yulduzchaga yetib bormadi. Qaytadan urinib koʻring!",
+      "crashed": "Voy! Robot toʻsiqqa urildi yoki maydon chetidan chiqib ketdi!",
+      "blockMove": "Olgʻa",
+      "blockLeft": "Chapga",
+      "blockRight": "Oʻngga",
+      "run": "Dasturni ishga tushirish",
+      "resetSimulation": "Qayta tiklash",
+      "clearWorkspace": "Tozalash"
+    },
+    "successTitle": "Kvest yakunlandi!",
+    "successDesc": "Ajoyib ish! Koʻnikmalaringiz oshib bormoqda.",
+    "saving": "Jarayon saqlanmoqda..."
   }
 }

@@ -34,6 +34,7 @@ import { WeeklyActivityChart } from "@/components/analytics/WeeklyActivityChart"
 import { StrengthsCard } from "@/components/analytics/StrengthsCard";
 import { WeaknessesCard } from "@/components/analytics/WeaknessesCard";
 import { RecommendationsCard } from "@/components/analytics/RecommendationsCard";
+import { UniversityChancesCard } from "@/components/analytics/UniversityChancesCard";
 
 export function AnalyticsPage() {
   const { t } = useI18n();
@@ -98,6 +99,12 @@ export function AnalyticsPage() {
       {analytics.aiAnalysisStudent && (
         <div className="my-4">
           <AiAnalysisCard feedback={analytics.aiAnalysisStudent} />
+        </div>
+      )}
+
+      {analytics.universityChances && analytics.universityChances.length > 0 && (
+        <div className="my-4">
+          <UniversityChancesCard items={analytics.universityChances} />
         </div>
       )}
 

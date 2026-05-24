@@ -25,9 +25,9 @@ const priorityKey = {
 } as const;
 
 const priorityTone = {
-  high: "bg-[#ffe9e1] text-[#f15d2a]",
-  medium: "bg-[#fff5d8] text-[#8a6b00]",
-  low: "bg-[#e8f8ef] text-[#089567]",
+  high: "bg-rose-100 text-rose-700",
+  medium: "bg-amber-100 text-amber-700",
+  low: "bg-emerald-100 text-emerald-700",
 } as const;
 
 export function RecommendationsPage() {
@@ -102,7 +102,7 @@ export function RecommendationsPage() {
       <div className="p-6 lg:p-8">
         <div className="mb-8 grid gap-6 lg:grid-cols-[260px_1fr]">
           <aside className="rounded-[28px] bg-white p-6 shadow-[0_18px_35px_rgba(37,38,34,0.05)]">
-            <div className="grid size-20 place-items-center rounded-[24px] bg-[#f2ff19] text-[#252621] shadow-[0_0_24px_rgba(242,255,25,0.5)]">
+            <div className="grid size-20 place-items-center rounded-[24px] bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-[0_0_24px_rgba(16,185,129,0.4)]">
               <SparklesIcon className="size-9" />
             </div>
             <p className="mt-5 text-xs font-medium uppercase text-[#77786f]">
@@ -164,13 +164,13 @@ export function RecommendationsPage() {
                       {t(priorityKey[rec.priority])}
                     </span>
                   </div>
-                  <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f2f2ec] text-[#555651]">
-                    <LightBulbIcon className="size-5" />
+                  <span className="grid size-11 shrink-0 place-items-center rounded-full bg-amber-100 text-amber-600">
+                    <LightBulbIcon className="size-5 stroke-[2]" />
                   </span>
                 </div>
 
                 <div className="rounded-[22px] bg-[#ededdf] p-5">
-                  <div className="mb-4 h-1 rounded-full bg-[#f2ff19]" />
+                  <div className="mb-4 h-1 rounded-full bg-emerald-400" />
                   <p className="text-sm leading-relaxed text-[#555651]">
                     {rec.description}
                   </p>
@@ -252,7 +252,7 @@ function StepsPanel({ items }: { items: string[] }) {
       <ul className="space-y-3 text-sm text-[#555651]">
         {items.slice(0, 4).map((item, index) => (
           <li key={`${item}-${index}`} className="flex items-start gap-3">
-            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[#f2ff19] text-xs font-semibold text-[#252621]">
+            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-emerald-500 text-xs font-semibold text-white">
               {index + 1}
             </span>
             <span className="leading-relaxed">{item}</span>

@@ -1,7 +1,5 @@
 import {
-  BookOpenIcon,
   ChartBarIcon,
-  ClockIcon,
   MagnifyingGlassIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
@@ -19,8 +17,6 @@ type NavItem = {
 const PRIMARY_NAV: ReadonlyArray<NavItem> = [
   { icon: PencilSquareIcon, labelKey: "nav.newTask", panel: "chat" },
   { icon: ChartBarIcon, labelKey: "nav.analytics", panel: "analytics" },
-  { icon: ClockIcon, labelKey: "nav.scheduled", badgeKey: "chat.badgeNew" },
-  { icon: BookOpenIcon, labelKey: "nav.library" },
 ];
 
 export function SidebarMainNav({

@@ -27,7 +27,13 @@
     "yearsOld": "{age} years",
     "noData": "No data",
     "studentFallback": "Student",
-    "loadFailed": "Failed to load"
+    "loadFailed": "Failed to load",
+    "reset": "Reset",
+    "hint": "Hint",
+    "showHint": "Hint",
+    "hideHint": "Hide hint",
+    "check": "Check answer",
+    "solved": "Solved!"
   },
   "languages": {
     "ru": "Русский",
@@ -191,7 +197,14 @@
     "levelCardTitle": "Level {level}",
     "levelCardNext": "to next level {xp} XP",
     "aiAnalysisTitle": "Individual AI Analysis",
-    "aiAnalysisDescription": "Detailed analysis of academic performance, career prospects, and personalized recommendations from your AI tutor."
+    "aiAnalysisDescription": "Detailed analysis of academic performance, career prospects, and personalized recommendations from your AI tutor.",
+    "universityChancesTitle": "University admission chances",
+    "universityChancesDesc": "Estimated chances based on your current grades and chosen direction.",
+    "chance": {
+      "high": "High chance",
+      "medium": "Average",
+      "low": "Low chance"
+    }
   },
   "quests": {
     "title": "Quests",
@@ -209,7 +222,16 @@
       "FAILED": "Failed"
     },
     "xpReward": "{xp} XP",
-    "estimatedTime": "{minutes} min"
+    "estimatedTime": "{minutes} min",
+    "matchstick": {
+      "title": "Matchstick puzzle",
+      "dontRemoveHorizontal": "Cannot remove the main horizontal line of the sign.",
+      "placeInHand": "Place the matchstick back on the field first.",
+      "invalidDigits": "Some digits are formed incorrectly.",
+      "incorrectEquation": "Equation is incorrect: {eq}",
+      "inHand": "Matchstick in hand. Click an empty slot to place it.",
+      "howTo": "Click a matchstick to pick up, or an empty slot to place."
+    }
   },
   "profile": {
     "title": "Profile",
@@ -649,5 +671,38 @@
     "free": "Free plan",
     "credits": "Credits plan",
     "quests": "Quests plan"
+  },
+  "quests": {
+    "matchstick": {
+      "title": "Matchstick Puzzle",
+      "shortTitle": "Logical Matchstick Puzzle",
+      "defaultTask": "Move one matchstick to make the equation correct.",
+      "inHand": "Matchstick in hand. Click an empty slot to place it.",
+      "howTo": "Click a matchstick to pick it up, or an empty slot to place it.",
+      "dontRemoveHorizontal": "Cannot remove the main horizontal line of the sign.",
+      "placeInHand": "Place the matchstick back onto the field first.",
+      "invalidDigits": "Some digits are formed incorrectly.",
+      "incorrectEquation": "Incorrect equation: {eq}"
+    },
+    "scratch": {
+      "title": "Scratch Quest: Algorithms",
+      "shortTitle": "Scratch Algorithmic Quest",
+      "defaultTask": "Help the robot reach the finish line.",
+      "palette": "Available Blocks",
+      "workspace": "Action Algorithm",
+      "emptyHint": "Click blocks above to build your program.",
+      "emptyWorkspace": "Add action blocks to the workspace.",
+      "didNotReach": "The robot stopped, but did not reach the star. Try again!",
+      "crashed": "Oops! The robot crashed into an obstacle or went out of bounds!",
+      "blockMove": "Move Forward",
+      "blockLeft": "Turn Left",
+      "blockRight": "Turn Right",
+      "run": "Run Program",
+      "resetSimulation": "Reset",
+      "clearWorkspace": "Clear"
+    },
+    "successTitle": "Quest Completed!",
+    "successDesc": "Excellent job! Your skills are growing.",
+    "saving": "Saving progress..."
   }
 }

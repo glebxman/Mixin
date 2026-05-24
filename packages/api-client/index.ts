@@ -41,6 +41,7 @@ export {
   type QuestStrategy,
   type IntegrationStatus,
   type AiModuleStatus,
+  type UniversityChance,
   type StudentAnalytics,
   type Quest,
 } from "./src/student";

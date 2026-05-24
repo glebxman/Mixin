@@ -9,6 +9,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { cn } from "@edtech/ui";
 import { MermaidDiagram } from "./MermaidDiagram";
+import { QuestRunner } from "../quests/QuestRunner";
 import "katex/dist/katex.min.css";
 
 /**
@@ -98,16 +99,26 @@ const components: Components = {
     if (
       child &&
       typeof child === "object" &&
-      "props" in child &&
-      child.props?.className === "language-mermaid"
+      "props" in child
     ) {
-      const code =
-        typeof child.props.children === "string"
-          ? child.props.children
-          : Array.isArray(child.props.children)
-            ? child.props.children.join("")
-            : "";
-      return <MermaidDiagram code={code.trim()} />;
+      if (child.props?.className === "language-mermaid") {
+        const code =
+          typeof child.props.children === "string"
+            ? child.props.children
+            : Array.isArray(child.props.children)
+              ? child.props.children.join("")
+              : "";
+        return <MermaidDiagram code={code.trim()} />;
+      }
+      if (child.props?.className === "language-quest") {
+        const code =
+          typeof child.props.children === "string"
+            ? child.props.children
+            : Array.isArray(child.props.children)
+              ? child.props.children.join("")
+              : "";
+        return <QuestRunner code={code.trim()} />;
+      }
     }
     return (
       <pre className="my-4 overflow-x-auto rounded-xl bg-neutral-50 p-4 text-[13px] leading-6 text-neutral-900">
